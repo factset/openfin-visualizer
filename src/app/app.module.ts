@@ -36,7 +36,7 @@ import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/
     MatDialogModule,
     MatInputModule
   ],
-  entryComponents: [AddTabDialogComponent]
+  entryComponents: [AddTabDialogComponent],
   providers: [],
   bootstrap: [AppComponent]
 })
