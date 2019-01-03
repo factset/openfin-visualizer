@@ -1,0 +1,58 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+$standard-primary: mat-palette($mat-blue, 500);
+$standard-accent:  mat-palette($mat-amber, A200, A100, A400);
+$standard-warn:    mat-palette($mat-red, 500);
+$standard-theme: mat-light-theme($standard-primary, $standard-accent, $standard-warn);
+
+@include angular-material-theme($standard-theme);
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Arial';
+  height: 100%;
+  margin: 0 !important;
+}
+
+// Tab overrides
+mat-tab-header {
+  border-bottom: none !important;
+  margin-left: 50px;
+}
+
+.mat-tab-label {
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.mat-tab-list::after {
+  position: absolute;
+  content: '';
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.mat-tab-label-active {
+  border-bottom: none;
+}
+
+/*.mat-tab-label-active::after {
+  position: absolute;
+  content: '';
+  bottom: -4px;
+  width: 100%;
+  height: 0;
+  border-bottom: solid 5px blue;
+}*/
+
+.mat-tab-group.mat-primary .mat-ink-bar {
+  height: 1px;
+  /*background-color: #FAFAFA;*/
+  transition: none;
+}

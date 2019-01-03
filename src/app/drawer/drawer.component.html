@@ -1,0 +1,12 @@
+<mat-drawer-container id="container">
+  <mat-drawer #sidenav mode="side" [(opened)]="opened">
+    Sidenav
+  </mat-drawer>
+  <mat-drawer-content>
+    <button mat-stroked-button id="drawer-toggle" (click)=sidenav.toggle()>
+      <mat-icon aria-label="Expand drawer" *ngIf="!opened">keyboard_arrow_right</mat-icon>
+      <mat-icon aria-label="Collapse drawer" *ngIf="opened">keyboard_arrow_left</mat-icon>
+    </button>
+    <app-tabs-container></app-tabs-container>
+  </mat-drawer-content>
+</mat-drawer-container>

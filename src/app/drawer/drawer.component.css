@@ -1,0 +1,15 @@
+#container {
+  height: 100%;
+}
+
+#drawer-toggle {
+  position: absolute;
+  background-color: white;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 !important;
+  min-width: 0 !important;
+  width: 32px !important;
+  border-radius: 0 !important;
+  margin-left: -1px;
+}
