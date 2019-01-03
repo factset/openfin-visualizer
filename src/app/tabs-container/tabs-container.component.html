@@ -8,18 +8,11 @@
     <mat-tab *ngFor="let tab of tabs; let index = index">
       <ng-template mat-tab-label>
         {{tab.label}}
-        <mat-icon aria-label="Add tab" id="remove-tab" (click)="removeTab($event)">
+        <mat-icon aria-label="Remove tab" id="remove-tab" (click)="removeTab($event, index)">
           clear
         </mat-icon>
       </ng-template>
       {{ tab.topic }}
     </mat-tab>
-    <!--<mat-tab label="Add" disabled>
-      <ng-template mat-tab-label>
-        <button mat-icon-button>
-          <mat-icon aria-label="Add tab" id="add-button">add</mat-icon>
-        </button>
-      </ng-template>
-    </mat-tab>-->
   </mat-tab-group>
 </div>

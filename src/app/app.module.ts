@@ -10,11 +10,12 @@ import {
   MatButtonModule,
   MatIconModule,
   MatDialogModule,
-  MatInputModule
+  MatInputModule,
+  MatListModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
-import { DrawerComponent } from './drawer/drawer.component';
+import { DrawerComponent, AddVersionDialogComponent } from './drawer/drawer.component';
 import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/tabs-container.component';
 
 @NgModule({
@@ -22,7 +23,8 @@ import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/
     AppComponent,
     DrawerComponent,
     TabsContainerComponent,
-    AddTabDialogComponent
+    AddTabDialogComponent,
+    AddVersionDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -34,9 +36,13 @@ import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatInputModule
+    MatInputModule,
+    MatListModule
   ],
-  entryComponents: [AddTabDialogComponent],
+  entryComponents: [
+    AddTabDialogComponent,
+    AddVersionDialogComponent
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

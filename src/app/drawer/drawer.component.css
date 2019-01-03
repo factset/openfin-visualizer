@@ -2,6 +2,11 @@
   height: 100%;
 }
 
+#sidenav {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 #drawer-toggle {
   position: absolute;
   background-color: white;
@@ -12,4 +17,54 @@
   width: 32px !important;
   border-radius: 0 !important;
   margin-left: -1px;
+}
+
+#add-version {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: 5px;
+  bottom: 5px;
+  font-size: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+#add-version:hover {
+  cursor: pointer;
+}
+
+#remove-version {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: 5px;
+  font-size: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  visibility: hidden;
+}
+
+#remove-version:hover {
+  cursor: pointer;
+  background: red;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.version-item-active {
+  color: #2196f3;
+}
+
+.version-item:hover {
+  cursor: pointer;
+  color: #2196f3;
+}
+
+.version-item:hover #remove-version {
+  color: rgba(0, 0, 0, 0.87);
+  visibility: visible;
 }

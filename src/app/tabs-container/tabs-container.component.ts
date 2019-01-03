@@ -18,6 +18,8 @@ export class TabsContainerComponent implements OnInit {
   ];
   selected = new FormControl(0);
 
+  topic: string;
+
   constructor(public dialog: MatDialog) { }
 
   ngOnInit() {
@@ -30,9 +32,10 @@ export class TabsContainerComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      //this.topic = result;
-      this.tabs.push({ label: result, topic: result });
-      this.selected.setValue(this.tabs.length - 1);
+      if (result) {
+        this.tabs.push({ label: result, topic: result });
+        this.selected.setValue(this.tabs.length - 1);
+      }
     });
   }
 

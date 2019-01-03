@@ -1,6 +1,21 @@
 <mat-drawer-container id="container">
-  <mat-drawer #sidenav mode="side" [(opened)]="opened">
-    Sidenav
+  <mat-drawer #sidenav id="sidenav" mode="side" [(opened)]="opened">
+    <mat-list>
+      <h3 mat-subheader>OpenFin Versions</h3>
+      <mat-list-item
+          class="version-item"
+          [ngClass]="{ 'version-item-active' : version.name === activeVersion }"
+          (click)="setActive(version.name)"
+          *ngFor="let version of versions; let index = index">
+        {{ version.name }}
+        <mat-icon aria-label="Remove version" id="remove-version" (click)="removeVersion($event)">
+          clear
+        </mat-icon>
+      </mat-list-item>
+    </mat-list>
+    <mat-icon id="add-version" aria-label="Add version" (click)="addVersion($event)">
+      add
+    </mat-icon>
   </mat-drawer>
   <mat-drawer-content>
     <button mat-stroked-button id="drawer-toggle" (click)=sidenav.toggle()>
