@@ -1,0 +1,138 @@
+.viewer-container {
+  padding: 0 40px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.viewer-options {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin: 10px 0;
+  flex: 0 0 auto;
+}
+
+.viewer-log-container {
+  margin-bottom: 20px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewer-log-title {
+  flex: 0 0 auto;
+}
+
+.viewer-log-divider {
+  flex: 0 0 auto;
+  height: 1px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.viewer-log {
+  margin-top: 10px;
+  overflow-y: scroll;
+  flex: 1 1 auto;
+  padding: 0 7px 0 10px;
+}
+
+.viewer-message-container {
+  margin: 20px 0 !important;
+  display: flex;
+  flex-direction: row;
+}
+
+.viewer-message-other {
+  flex-direction: row;
+}
+
+.viewer-message-user {
+  flex-direction: row-reverse;
+}
+
+.participant-icon-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.participant-icon {
+  color: white;
+}
+
+.viewer-message-content {
+  margin: 0 20px;
+  line-height: 34px; /* maybe set to default size */
+  font-size: 18px; /* maybe set to default size */
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0 15px;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+  display: block;
+  white-space: pre;
+  vertical-align: baseline;
+  min-width: 64px;
+  border-radius: 4px;
+  overflow: visible;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 500;
+  user-select: none;
+}
+
+.viewer-message-content:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.viewer-message-datetime {
+  display: none;
+}
+
+.viewer-message-content:hover + .viewer-message-datetime {
+  display: block;
+}
+
+.viewer-response-container {
+  margin-bottom: 20px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+}
+
+.viewer-response-input-container {
+  flex: 1 0 auto;
+}
+
+.viewer-response-button {
+  flex: 0 0 auto;
+}
+
+.viewer-response-input-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.add-json-button {
+  flex: 0 0 auto;
+  margin-right: 10px;
+}
+
+.viewer-response-input {
+  flex: 1 1 auto;
+  line-height: 34px; /* maybe set to default size */
+  font-size: 18px; /* maybe set to default size */
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 1);
+}
+
+.viewer-response-input:focus {
+  outline: none;
+  border-bottom: 1px solid #2196f3;
+}

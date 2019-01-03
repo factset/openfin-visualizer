@@ -17,19 +17,13 @@
   width: 32px !important;
   border-radius: 0 !important;
   margin-left: -1px;
+  z-index: 30;
 }
 
 #add-version {
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  right: 5px;
-  bottom: 5px;
-  font-size: 14px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+  right: 10px;
+  bottom: 10px;
 }
 
 #add-version:hover {
@@ -51,7 +45,7 @@
 
 #remove-version:hover {
   cursor: pointer;
-  background: red;
+  background: rgba(256, 0, 0, 0.50);
   color: rgba(0, 0, 0, 0.87);
 }
 

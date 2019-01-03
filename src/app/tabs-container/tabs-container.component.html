@@ -1,4 +1,4 @@
-<div>
+<div id="tabs-container">
   <div id="add-button">
     <button mat-icon-button (click)="addTab()">
       <mat-icon aria-label="Add tab">add</mat-icon>
@@ -12,7 +12,7 @@
           clear
         </mat-icon>
       </ng-template>
-      {{ tab.topic }}
+      <app-viewer [topic]="tab.topic"></app-viewer>
     </mat-tab>
   </mat-tab-group>
 </div>

@@ -11,12 +11,18 @@ import {
   MatIconModule,
   MatDialogModule,
   MatInputModule,
-  MatListModule
+  MatListModule,
+  MatCardModule,
+  MatDividerModule,
+  MatTooltipModule
 } from '@angular/material';
+
+import { NgJsonEditorModule } from 'ang-jsoneditor';
 
 import { AppComponent } from './app.component';
 import { DrawerComponent, AddVersionDialogComponent } from './drawer/drawer.component';
 import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/tabs-container.component';
+import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.component';
 
 @NgModule({
   declarations: [
@@ -24,10 +30,13 @@ import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/
     DrawerComponent,
     TabsContainerComponent,
     AddTabDialogComponent,
-    AddVersionDialogComponent
+    AddVersionDialogComponent,
+    ViewerComponent,
+    AddJsonDialogComponent
   ],
   imports: [
     BrowserModule,
+    NgJsonEditorModule,
     BrowserAnimationsModule,
     NoopAnimationsModule, // disable animations for now
     FormsModule,
@@ -37,11 +46,15 @@ import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/
     MatIconModule,
     MatDialogModule,
     MatInputModule,
-    MatListModule
+    MatListModule,
+    MatCardModule,
+    MatDividerModule,
+    MatTooltipModule
   ],
   entryComponents: [
     AddTabDialogComponent,
-    AddVersionDialogComponent
+    AddVersionDialogComponent,
+    AddJsonDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

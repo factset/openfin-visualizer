@@ -8,15 +8,22 @@
           (click)="setActive(version.name)"
           *ngFor="let version of versions; let index = index">
         {{ version.name }}
-        <mat-icon aria-label="Remove version" id="remove-version" (click)="removeVersion($event)">
+        <mat-icon
+            aria-label="Remove version"
+            id="remove-version"
+            (click)="removeVersion($event, index)">
           clear
         </mat-icon>
       </mat-list-item>
     </mat-list>
-    <mat-icon id="add-version" aria-label="Add version" (click)="addVersion($event)">
-      add
-    </mat-icon>
+    <button mat-icon-button id="add-version" (click)="addVersion($event)">
+      <mat-icon aria-label="Add version">
+        add
+      </mat-icon>
+    </button>
+
   </mat-drawer>
+
   <mat-drawer-content>
     <button mat-stroked-button id="drawer-toggle" (click)=sidenav.toggle()>
       <mat-icon aria-label="Expand drawer" *ngIf="!opened">keyboard_arrow_right</mat-icon>

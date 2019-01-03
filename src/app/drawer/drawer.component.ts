@@ -13,7 +13,7 @@ export interface DialogData {
 })
 export class DrawerComponent implements OnInit {
 
-  opened: boolean = true;
+  opened: boolean;
   versions: any = [
     { name: 'Stable', options: {} }
   ];
@@ -32,8 +32,10 @@ export class DrawerComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.versions.push({ name: result, options: {} });
-      this.activeVersion = result;
+      if (result) {
+        this.versions.push({ name: result, options: {} });
+        this.activeVersion = result;
+      }
     });
   }
 

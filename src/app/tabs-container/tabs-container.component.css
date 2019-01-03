@@ -1,3 +1,7 @@
+#tabs-container {
+  height: 100%;
+}
+
 #add-button {
   position: absolute;
   top: 0;
@@ -36,5 +40,5 @@
 
 #remove-tab:hover {
   cursor: pointer;
-  background: red;
+  background: rgba(256, 0, 0, 0.50);
 }

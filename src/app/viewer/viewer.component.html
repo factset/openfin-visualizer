@@ -1,0 +1,78 @@
+<div class="viewer-container">
+  <div class="viewer-options">
+    <button mat-icon-button matTooltip="save log">
+      <mat-icon aria-label="Save log">save_alt</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="change view">
+      <mat-icon aria-label="Change view">view_quilt</mat-icon>
+    </button>
+  </div>
+
+  <mat-card class="viewer-log-container">
+    <mat-card-title class="viewer-log-title">{{ topic }}</mat-card-title>
+    <div class="viewer-log-divider"></div>
+    <mat-card-content #viewerLog class="viewer-log">
+      <div
+          #messageItems
+          class="viewer-message-container"
+          [ngClass]="message.participant === 'user' ? 'viewer-message-user' : 'viewer-message-other'"
+          *ngFor="let message of messages; let index = index">
+        <div
+            class="participant-icon-container"
+            [ngStyle]="{ 'background': getParticipantColor(message.participant) }"
+            [matTooltip]="message.participant"
+            [matTooltipPosition]="'below'">
+          <mat-icon
+              *ngIf="message.participant !== 'user'"
+              class="participant-icon"
+              aria-label="Change view">
+            desktop_windows
+          </mat-icon>
+          <mat-icon
+              *ngIf="message.participant === 'user'"
+              class="participant-icon"
+              aria-label="Change view">
+            person_outline
+          </mat-icon>
+        </div>
+        <pre
+            class="viewer-message-content json-content"
+            matTooltip="edit"
+            [matTooltipPosition]="message.participant !== 'user' ? 'after' : 'before'"
+            (click)="openJson(message.content)"
+            [innerHtml]="prettifyJson(message.content)">
+        </pre>
+        <div class="viewer-message-datetime">
+          {{ message.datetime }}
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="viewer-response-container">
+    <mat-card class="viewer-response-input-container">
+      <mat-card-content class="viewer-response-input-wrapper">
+        <button
+            mat-icon-button
+            class="add-json-button"
+            matTooltip="add json"
+            (click)="addJson()">
+          <mat-icon aria-label="Add JSON">playlist_add</mat-icon>
+        </button>
+        <input
+            class="viewer-response-input"
+            type="text"
+            [value]="message"
+            placeholder="Enter JSON to send to the bus"
+            (keyup)="onKey($event)" />
+      </mat-card-content>
+    </mat-card>
+    <button
+        mat-raised-button
+        color="primary"
+        class="viewer-response-button"
+        (click)="send()">
+      <mat-icon aria-label="Send message" class="send-message">send</mat-icon>
+    </button>
+  </div>
+</div>
