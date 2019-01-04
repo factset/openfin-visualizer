@@ -18,6 +18,7 @@ import {
 } from '@angular/material';
 
 import { NgJsonEditorModule } from 'ang-jsoneditor';
+import { NgxElectronModule } from 'ngx-electron';
 
 import { AppComponent } from './app.component';
 import { DrawerComponent, AddVersionDialogComponent } from './drawer/drawer.component';
@@ -37,6 +38,7 @@ import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.compone
   imports: [
     BrowserModule,
     NgJsonEditorModule,
+    NgxElectronModule,
     BrowserAnimationsModule,
     NoopAnimationsModule, // disable animations for now
     FormsModule,

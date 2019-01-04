@@ -1,5 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Subscription } from 'rxjs';
+import { OpenfinService } from '../openfin.service';
 
 export interface DialogData {
   version: string;
@@ -15,12 +17,13 @@ export class DrawerComponent implements OnInit {
 
   opened: boolean;
   versions: any = [
-    { name: 'Stable', options: {} }
+    { name: 'Stable', options: {}, version: '12.5.2.3' }
   ];
   version: string;
   activeVersion: string;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public dialog: MatDialog,
+              public openfin: OpenfinService) { }
 
   ngOnInit() {
   }
@@ -35,6 +38,11 @@ export class DrawerComponent implements OnInit {
       if (result) {
         this.versions.push({ name: result, options: {} });
         this.activeVersion = result;
+        this.openfin.connect(result).subscribe(ret => {
+          let version = this.versions.find(v => v.name === result);
+          if (version) version.version = ret.version;
+          console.log(version);
+        });
       }
     });
   }
