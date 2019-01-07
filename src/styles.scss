@@ -72,6 +72,11 @@ mat-tab-header {
   border-radius: 0 !important;
 }
 
+// Sidenav overrides
+mat-drawer {
+  width: 200px;
+}
+
 // JSON pretty stuff
 .string { color: #2196F3; }
 .number { color: #FB8C00; }

@@ -4,15 +4,15 @@
       <mat-icon aria-label="Add tab">add</mat-icon>
     </button>
   </div>
-  <mat-tab-group id="tabs" [selectedIndex]="selected.value" (selectedIndexChange)="selected.setValue($event)">
+  <mat-tab-group id="tabs" [selectedIndex]="selected.value" (selectedIndexChange)="changeSelected($event)">
     <mat-tab *ngFor="let tab of tabs; let index = index">
-      <ng-template mat-tab-label>
+      <ng-template matTabLabel>
         {{tab.label}}
         <mat-icon aria-label="Remove tab" id="remove-tab" (click)="removeTab($event, index)">
           clear
         </mat-icon>
       </ng-template>
-      <app-viewer [topic]="tab.topic"></app-viewer>
+      <app-viewer #appViewer [runtime]="tab.runtime" [uuid]="tab.uuid" [topic]="tab.topic"></app-viewer>
     </mat-tab>
   </mat-tab-group>
 </div>

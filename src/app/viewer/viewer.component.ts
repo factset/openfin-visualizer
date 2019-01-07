@@ -7,10 +7,14 @@ import {
   ViewChild,
   ViewChildren,
   ElementRef,
-  QueryList
+  QueryList,
+  NgZone
 } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
+
+import { Subscription } from 'rxjs';
+import { OpenfinService } from '../openfin.service';
 
 export interface DialogData {
   json: string;
@@ -24,6 +28,8 @@ export interface DialogData {
 })
 export class ViewerComponent implements OnInit {
 
+  @Input() runtime: string;
+  @Input() uuid: string;
   @Input() topic: string;
   @ViewChild('viewerLog') viewerLog: ElementRef;
   @ViewChildren('messageItems') messageItems: QueryList<any>;
@@ -38,7 +44,7 @@ export class ViewerComponent implements OnInit {
     day: 'numeric'
   };
 
-  messages: any = [
+  /*messages: any = [
     {
       participant: 'factset-prod-main',
       datetime: new Date().toLocaleString('en-US'),
@@ -64,14 +70,20 @@ export class ViewerComponent implements OnInit {
     'user': '#2196F3',
     'factset-prod-main': '#4DB6AC', // 300 level palette color
     'random-client-app': '#FFC107'
-  };
+  };*/
+  messages: any = [];
+  participants: any = {};
   colors: any = [
 
   ];
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public openfin: OpenfinService,
+              public dialog: MatDialog,
+              public zone: NgZone) {
+  }
 
   ngOnInit() {
+    this.subscribe();
   }
 
   ngAfterViewInit() {
@@ -80,8 +92,30 @@ export class ViewerComponent implements OnInit {
     });
   }
 
+  subscribe() {
+    this.openfin.subscribe(this.runtime, this.uuid, this.topic).subscribe(data => {
+      this.zone.run(() => {
+        console.log(data.sender.uuid + ' : ' + data.message); // sender -> uuid, name
+        // add to message items
+        if (!this.participants.hasOwnProperty(data.sender.uuid)) {
+          this.participants[data.sender.uuid] = {
+            name: data.sender.name ? data.sender.name : data.sender.uuid,
+            uuid: data.sender.uuid,
+            color: '#4DB6AC' // TODO* random color here
+          };
+        }
+
+        this.messages.push({
+          participant: this.participants[data.sender.uuid].name,
+          datetime: new Date().toLocaleString('en-US'), // TODO* get time from OF object
+          content: data.message
+        });
+      });
+    });
+  }
+
   getParticipantColor(participant: string): string {
-    return this.participants[participant];
+    return this.participants[participant].color;
   }
 
   parseMessage(message: string) {
@@ -128,6 +162,12 @@ export class ViewerComponent implements OnInit {
 
   scrollToEnd() {
     this.viewerLog.nativeElement.scrollTop = this.viewerLog.nativeElement.scrollHeight;
+  }
+
+  waitScrollToEnd() {
+    setTimeout(() => {
+      this.scrollToEnd();
+    }, 0);
   }
 
   onKey(event: any) {

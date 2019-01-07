@@ -3,8 +3,8 @@
 }
 
 #sidenav {
-  padding-left: 20px;
-  padding-right: 20px;
+  /*padding-left: 10px;
+  padding-right: 10px;*/
 }
 
 #drawer-toggle {
@@ -20,22 +20,22 @@
   z-index: 30;
 }
 
-#add-version {
+#add-channel {
   position: absolute;
   right: 10px;
   bottom: 10px;
 }
 
-#add-version:hover {
+#add-channel:hover {
   cursor: pointer;
 }
 
-#remove-version {
+.remove-channel {
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
-  right: 5px;
+  right: 16px;
   font-size: 14px;
   width: 18px;
   height: 18px;
@@ -43,22 +43,46 @@
   visibility: hidden;
 }
 
-#remove-version:hover {
+.remove-channel:hover {
   cursor: pointer;
   background: rgba(256, 0, 0, 0.50);
   color: rgba(0, 0, 0, 0.87);
 }
 
-.version-item-active {
+.channel-item-active {
   color: #2196f3;
 }
 
-.version-item:hover {
+.channel-item-disabled {
+  color: rgba(0, 0, 0, 0.50) !important;
+}
+
+.channel-item-disabled:hover {
+  cursor: progress !important;
+}
+
+.channel-item:hover {
   cursor: pointer;
   color: #2196f3;
 }
 
-.version-item:hover #remove-version {
+.channel-item:hover .remove-channel {
   color: rgba(0, 0, 0, 0.87);
   visibility: visible;
+}
+
+.channel-item-disabled:hover .remove-channel {
+  visibility: hidden !important;
+}
+
+.channel-status {
+  margin-right: 5px;
+}
+
+.channel-status-connected {
+  color: #4CAF50;
+}
+
+.channel-status-connecting {
+  color: #F44336;
 }

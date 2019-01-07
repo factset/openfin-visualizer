@@ -1,27 +1,30 @@
 <mat-drawer-container id="container">
   <mat-drawer #sidenav id="sidenav" mode="side" [(opened)]="opened">
     <mat-list>
-      <h3 mat-subheader>OpenFin Versions</h3>
+      <h3 mat-subheader>OpenFin Channels</h3>
       <mat-list-item
-          class="version-item"
-          [ngClass]="{ 'version-item-active' : version.name === activeVersion }"
-          (click)="setActive(version.name)"
-          *ngFor="let version of versions; let index = index">
-        {{ version.name }}
+          class="channel-item"
+          [ngClass]="{ 'channel-item-active' : channel.runtime === activeChannel, 'channel-item-disabled' : !channel.hasOwnProperty('version') }"
+          (click)="setActive(channel.runtime)"
+          *ngFor="let channel of channels; let index = index">
         <mat-icon
-            aria-label="Remove version"
-            id="remove-version"
-            (click)="removeVersion($event, index)">
+            aria-label="Connection"
+            class="channel-status"
+            [ngClass]="channel.version ? 'channel-status-connected' : 'channel-status-connecting'">
+          import_export
+        </mat-icon>
+        <span class="channel-item-content">{{ channel.runtime }}</span>
+        <mat-icon
+            aria-label="Remove channel"
+            class="remove-channel"
+            (click)="removeChannel($event, index)">
           clear
         </mat-icon>
       </mat-list-item>
     </mat-list>
-    <button mat-icon-button id="add-version" (click)="addVersion($event)">
-      <mat-icon aria-label="Add version">
-        add
-      </mat-icon>
+    <button mat-icon-button id="add-channel" (click)="addChannel($event)">
+      <mat-icon aria-label="Add channel">add</mat-icon>
     </button>
-
   </mat-drawer>
 
   <mat-drawer-content>
@@ -29,6 +32,6 @@
       <mat-icon aria-label="Expand drawer" *ngIf="!opened">keyboard_arrow_right</mat-icon>
       <mat-icon aria-label="Collapse drawer" *ngIf="opened">keyboard_arrow_left</mat-icon>
     </button>
-    <app-tabs-container></app-tabs-container>
+    <app-tabs-container [chosenRuntime]="activeChannel"></app-tabs-container>
   </mat-drawer-content>
 </mat-drawer-container>

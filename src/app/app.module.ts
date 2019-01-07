@@ -14,7 +14,9 @@ import {
   MatListModule,
   MatCardModule,
   MatDividerModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatSelectModule,
+  MatSnackBarModule
 } from '@angular/material';
 
 import { NgJsonEditorModule } from 'ang-jsoneditor';
@@ -51,7 +53,9 @@ import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.compone
     MatListModule,
     MatCardModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSelectModule,
+    MatSnackBarModule
   ],
   entryComponents: [
     AddTabDialogComponent,

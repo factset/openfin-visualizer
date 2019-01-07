@@ -67,8 +67,6 @@
 
 .viewer-message-content {
   margin: 0 20px;
-  line-height: 34px; /* maybe set to default size */
-  font-size: 18px; /* maybe set to default size */
   border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 0 15px;
   box-sizing: border-box;
@@ -124,8 +122,8 @@
 
 .viewer-response-input {
   flex: 1 1 auto;
-  line-height: 34px; /* maybe set to default size */
-  font-size: 18px; /* maybe set to default size */
+  line-height: 30px; /* maybe set to default size */
+  font-size: 16px; /* maybe set to default size */
   border-top: none;
   border-left: none;
   border-right: none;
