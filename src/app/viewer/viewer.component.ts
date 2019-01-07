@@ -14,10 +14,10 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/
 import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
 
 import { Subscription } from 'rxjs';
+import { ClipboardService } from 'ngx-clipboard';
 import { OpenfinService } from '../openfin.service';
 
 export interface DialogData {
-  json: string;
   data: any;
 }
 
@@ -34,7 +34,6 @@ export class ViewerComponent implements OnInit {
   @ViewChild('viewerLog') viewerLog: ElementRef;
   @ViewChildren('messageItems') messageItems: QueryList<any>;
 
-  json: string;
   data: any;
   message: string = '';
   dateOptions: any = {
@@ -43,38 +42,23 @@ export class ViewerComponent implements OnInit {
     month: 'long',
     day: 'numeric'
   };
-
-  /*messages: any = [
-    {
-      participant: 'factset-prod-main',
-      datetime: new Date().toLocaleString('en-US'),
-      content: '{ "com.factset.symbology.entity":"0016YD-E","com.factset.symbology.regionalticker":"FDS-US" }'
-    },
-    {
-      participant: 'user',
-      datetime: new Date().toLocaleString('en-US'),
-      content: '{ "awesomenessLevel":"too much to handle" }'
-    },
-    {
-      participant: 'random-client-app',
-      datetime: new Date().toLocaleString('en-US'),
-      content: '{ "com.factset.symbology.entity":"00ABYD-Z","com.factset.symbology.regionalticker":"VIX" }'
-    },
-    {
-      participant: 'factset-prod-main',
-      datetime: new Date().toLocaleString('en-US'),
-      content: '{ "com.factset.symbology.entity":"0016YD-E","com.factset.symbology.regionalticker":"FDS-US" }'
-    },
-  ];
-  participants: any = {
-    'user': '#2196F3',
-    'factset-prod-main': '#4DB6AC', // 300 level palette color
-    'random-client-app': '#FFC107'
-  };*/
+  selfUuid: string;
   messages: any = [];
   participants: any = {};
   colors: any = [
-
+    '#E57373',
+    '#BA68C8',
+    '#9575CD',
+    '#4FC3F7',
+    '#4DD0E1',
+    '#AED581',
+    '#DCE775',
+    '#FFD54F',
+    '#F06292',
+    '#7986CB',
+    '#4DB6AC',
+    '#FFF176',
+    '#81C784'
   ];
 
   constructor(public openfin: OpenfinService,
@@ -87,6 +71,7 @@ export class ViewerComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    this.selfUuid  = `openfin-visualizer-${this.runtime}`;
     this.messageItems.changes.subscribe(t => {
       this.scrollToEnd();
     });
@@ -101,7 +86,8 @@ export class ViewerComponent implements OnInit {
           this.participants[data.sender.uuid] = {
             name: data.sender.name ? data.sender.name : data.sender.uuid,
             uuid: data.sender.uuid,
-            color: '#4DB6AC' // TODO* random color here
+            color: data.sender.uuid === this.selfUuid
+              ? '#2196F3' : this.colors.pop() // TODO* random color
           };
         }
 
@@ -114,13 +100,20 @@ export class ViewerComponent implements OnInit {
     });
   }
 
-  getParticipantColor(participant: string): string {
-    return this.participants[participant].color;
+  send() {
+    if (this.message && JSON.parse(this.message)) {
+      if (this.uuid === '*') {
+        this.openfin.publish(this.runtime, this.topic, JSON.parse(this.message));
+      } else {
+        this.openfin.send(this.runtime, this.uuid, this.topic, JSON.parse(this.message));
+      }
+
+      this.message = '';
+    }
   }
 
-  parseMessage(message: string) {
-    // get uuid and relevant identifying info and add to participants
-    // get data object and store in messages as message
+  getParticipantColor(participant: string): string {
+    return this.participants[participant].color;
   }
 
   openJson(data: string) {
@@ -147,17 +140,6 @@ export class ViewerComponent implements OnInit {
         this.message = JSON.stringify(result);
       }
     });
-  }
-
-  send() {
-    if (this.message && JSON.parse(this.message)) {
-      this.messages.push({
-        participant: 'user',
-        datetime: new Date().toLocaleString('en-US'),
-        content: this.message
-      });
-      this.message = '';
-    }
   }
 
   scrollToEnd() {
@@ -203,11 +185,11 @@ export class ViewerComponent implements OnInit {
   template: `
     <h1 mat-dialog-title>Add JSON</h1>
     <div mat-dialog-content>
-      <json-editor [options]="editorOptions" [data]="data"></json-editor>
+      <json-editor [options]="editorOptions" [data]="data" (change)="getData($event)"></json-editor>
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="onNoClick()">Cancel</button>
-      <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+      <button mat-button (click)="onClick()" cdkFocusInitial>Ok</button>
       <button mat-button (click)="onCopy()" style="margin-left: auto;">Copy</button>
     </div>
   `,
@@ -218,11 +200,21 @@ export class AddJsonDialogComponent {
   @ViewChild(JsonEditorComponent) editor: JsonEditorComponent;
 
   editorOptions: JsonEditorOptions;
+  json: any;
 
   constructor(public dialogRef: MatDialogRef<AddJsonDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: DialogData) {
+              @Inject(MAT_DIALOG_DATA) public data: DialogData,
+              public _clipboardService: ClipboardService) {
     this.editorOptions = new JsonEditorOptions();
     this.editorOptions.modes = ['code', 'text', 'tree', 'view']; // set all allowed modes
+  }
+
+  getData(event): void {
+    this.json = event;
+  }
+
+  onClick(): void {
+    this.dialogRef.close(this.json);
   }
 
   onNoClick(): void {
@@ -230,7 +222,7 @@ export class AddJsonDialogComponent {
   }
 
   onCopy(): void {
-
+    this._clipboardService.copyFromContent(JSON.stringify(this.json));
   }
 
 }

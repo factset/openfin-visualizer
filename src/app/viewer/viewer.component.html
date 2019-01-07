@@ -15,7 +15,7 @@
       <div
           #messageItems
           class="viewer-message-container"
-          [ngClass]="message.participant === 'user' ? 'viewer-message-user' : 'viewer-message-other'"
+          [ngClass]="message.participant === selfUuid ? 'viewer-message-user' : 'viewer-message-other'"
           *ngFor="let message of messages; let index = index">
         <div
             class="participant-icon-container"
@@ -23,13 +23,13 @@
             [matTooltip]="message.participant"
             [matTooltipPosition]="'below'">
           <mat-icon
-              *ngIf="message.participant !== 'user'"
+              *ngIf="message.participant !== selfUuid"
               class="participant-icon"
               aria-label="Change view">
             desktop_windows
           </mat-icon>
           <mat-icon
-              *ngIf="message.participant === 'user'"
+              *ngIf="message.participant === selfUuid"
               class="participant-icon"
               aria-label="Change view">
             person_outline
@@ -38,7 +38,7 @@
         <pre
             class="viewer-message-content json-content"
             matTooltip="edit"
-            [matTooltipPosition]="message.participant !== 'user' ? 'after' : 'before'"
+            [matTooltipPosition]="message.participant !== selfUuid ? 'after' : 'before'"
             (click)="openJson(message.content)"
             [innerHtml]="prettifyJson(message.content)">
         </pre>

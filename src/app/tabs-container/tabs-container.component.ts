@@ -72,8 +72,6 @@ export class TabsContainerComponent implements OnInit {
 
   changeSelected(event) {
     if (this.appViewers) {
-      console.log(event);
-      console.log(this.appViewers);
       this.selected.setValue(event);
       this.appViewers.toArray()[event].waitScrollToEnd();
     }

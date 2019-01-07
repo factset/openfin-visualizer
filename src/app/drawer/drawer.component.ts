@@ -21,7 +21,7 @@ export interface DialogData {
 })
 export class DrawerComponent implements OnInit {
 
-  opened: boolean;
+  opened: boolean = true;
   channels: any = [
     { runtime: 'Stable', options: {}, version: '12.5.2.3' }
   ];
@@ -70,7 +70,14 @@ export class DrawerComponent implements OnInit {
 
   removeChannel(event, index: number) {
     event.stopPropagation();
+    // TODO* call disconnect in openfin service
     this.channels.splice(index, 1);
+    this.activeChannel = this.channels.length > 0 ? this.channels[length - 1] : null;
+  }
+
+  removeAllChannels() {
+    event.stopPropagation();
+    // TODO* call disconnect for each channel
   }
 
   setActive(runtime: string) {

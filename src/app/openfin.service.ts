@@ -9,6 +9,7 @@ export class OpenfinService {
 
   private ipc: any;
   private runtimes: any = {};
+  private disconnects: any = {};
 
   constructor(private _electronService: ElectronService) {
     this.ipc = _electronService.ipcRenderer;
@@ -18,7 +19,7 @@ export class OpenfinService {
     });
 
     this.ipc.on('openfin-disconnected', (event, data) => {
-      this.disconnected(data.runtime, data.version);
+      this.disconnected(data.runtime);
     });
 
     this.ipc.on('openfin-subscribed', (event, data) => {
@@ -40,6 +41,13 @@ export class OpenfinService {
     this.ipc.send('openfin-disconnect', { runtime: runtime });
   }
 
+  /*disconnectAll() {
+    for (let runtime in this.runtimes) {
+      this.disconnects[runtime] = new Subject<any>();
+      this.ipc.send('openfin-disconnect', { runtime: runtime });
+    }
+  }*/
+
   subscribe(runtime: string, uuid: string, topic: string): Observable<any> {
     this.runtimes[runtime].topics[topic] = {};
     this.runtimes[runtime].topics[topic][uuid] = new Subject<any>();
@@ -51,13 +59,23 @@ export class OpenfinService {
     this.ipc.send('openfin-unsubscribe', { runtime: runtime, uuid: uuid, topic: topic });
   }
 
+  // TODO* create and return observable in case error occurs
+  publish(runtime: string, topic: string, data: any) {
+    this.ipc.send('openfin-publish', { runtime: runtime, topic: topic, data: data });
+  }
+
+  // TODO* create and return observable in case error occurs
+  send(runtime: string, uuid: string, topic: string, data: any) {
+    this.ipc.send('openfin-send', { runtime: runtime, uuid: uuid, topic: topic, data: data });
+  }
+
   // Receive Events
   connected(runtime: string, version: string) {
     this.runtimes[runtime].observable.next({ version: version });
   }
 
-  disconnected(runtime: string, version: string) {
-    //this.observables.runtimes[runtime].next({ version: })
+  disconnected(runtime: string) {
+    this.runtimes[runtime].observable.next({ version: null });
   }
 
   subscribed(runtime: string, targetUuid: string, uuid: string, topic: string, message: string) {

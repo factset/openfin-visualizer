@@ -28,6 +28,7 @@
     "core-js": "^2.5.4",
     "hadouken-js-adapter": "^0.38.1",
     "jsoneditor": "^5.26.3",
+    "ngx-clipboard": "^11.1.9",
     "ngx-electron": "^2.0.0",
     "rxjs": "^6.0.0",
     "zone.js": "^0.8.26"

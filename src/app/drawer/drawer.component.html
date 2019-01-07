@@ -17,12 +17,16 @@
         <mat-icon
             aria-label="Remove channel"
             class="remove-channel"
+            matTooltip="remove channel"
             (click)="removeChannel($event, index)">
           clear
         </mat-icon>
       </mat-list-item>
     </mat-list>
-    <button mat-icon-button id="add-channel" (click)="addChannel($event)">
+    <button mat-icon-button id="remove-all-channels" matTooltip="remove all" (click)="removeAllChannels()">
+      <mat-icon aria-label="Remove all channels">delete_sweep</mat-icon>
+    </button>
+    <button mat-icon-button id="add-channel" matTooltip="add channel" (click)="addChannel($event)">
       <mat-icon aria-label="Add channel">add</mat-icon>
     </button>
   </mat-drawer>

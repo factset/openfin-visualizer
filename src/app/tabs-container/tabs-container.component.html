@@ -1,6 +1,10 @@
 <div id="tabs-container">
-  <div id="add-button">
-    <button mat-icon-button (click)="addTab()">
+  <div id="add-button" [ngClass]="{ 'add-button-disabled': !chosenRuntime }">
+    <button
+        mat-icon-button
+        matTooltip="add topic"
+        (click)="addTab()"
+        [disabled]="!chosenRuntime">
       <mat-icon aria-label="Add tab">add</mat-icon>
     </button>
   </div>

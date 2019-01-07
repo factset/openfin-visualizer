@@ -21,6 +21,7 @@ import {
 
 import { NgJsonEditorModule } from 'ang-jsoneditor';
 import { NgxElectronModule } from 'ngx-electron';
+import { ClipboardModule } from 'ngx-clipboard';
 
 import { AppComponent } from './app.component';
 import { DrawerComponent, AddVersionDialogComponent } from './drawer/drawer.component';
@@ -41,6 +42,7 @@ import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.compone
     BrowserModule,
     NgJsonEditorModule,
     NgxElectronModule,
+    ClipboardModule,
     BrowserAnimationsModule,
     NoopAnimationsModule, // disable animations for now
     FormsModule,

@@ -14,11 +14,29 @@ ipcMain.on('openfin-connect', async (event, data) => {
 
 ipcMain.on('openfin-disconnect', async (event, data) => {
   let version = await Disconnect(data.runtime);
-  event.sender.send('openfin-disconnected', { runtime: data.runtime, version: version });
+  event.sender.send('openfin-disconnected', { runtime: data.runtime });
 });
+
+/*ipcMain.on('openfin-disconnect-all', async event => {
+  // TODO* utilize already existing exports
+  for (let runtime in runtimes) {
+    // Await disconnect call to ensure OpenFin receives the command
+    console.log(`Disconnecting from ${runtime}`);
+    await Disconnect(runtime);
+  }
+  event.sender.send('openfin-disconnected-all');
+});*/
 
 ipcMain.on('openfin-subscribe', async (event, data) => {
   await Subscribe(event.sender, data.runtime, data.uuid, data.topic);
+});
+
+ipcMain.on('openfin-publish', async (event, data) => {
+  await Publish(event.sender, data.runtime, data.topic, data.data);
+});
+
+ipcMain.on('openfin-send', async (event, data) => {
+  await Send(event.sender, data.runtime, data.uuid, data.topic, data.data);
 });
 
 async function Connect(runtime) {
@@ -56,7 +74,29 @@ async function Subscribe(sender, runtime, targetUuid, topic) {
     });
   }).then(() => {
     console.log(`Subscribed to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
-  }).catch(err => console.log(err));
+  }).catch(err => {
+    console.log(err);
+    sender.send('openfin-subscribe-error', { data: err });
+  });
+}
+
+async function Publish(sender, runtime, topic, data) {
+  await runtimes[runtime].InterApplicationBus.publish(topic, data).then(() => {
+    console.log(`Published data [${data}] on channel [${runtime}] with topic [${topic}]`);
+  }).catch(err =>  {
+    console.log(err);
+    sender.send('openfin-publish-error', { data: err });
+  });
+}
+
+// TODO* not yet working for some reason...
+async function Send(sender, runtime, targetUuid, topic, data) {
+  await runtimes[runtime].InterApplicationBus.send(targetUuid, topic, data).then(() => {
+    console.log(`Sent data [${data}] to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+  }).catch(err =>  {
+    console.log(err);
+    sender.send('openfin-send-error', { data: err });
+  });
 }
 
 // TODO* getProcessList -> get all objects on current runtime

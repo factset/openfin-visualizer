@@ -30,6 +30,16 @@
   cursor: pointer;
 }
 
+#remove-all-channels {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+}
+
+#remove-all-channels:hover {
+  cursor: pointer;
+}
+
 .remove-channel {
   position: absolute;
   display: flex;
