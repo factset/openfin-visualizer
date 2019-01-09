@@ -75,7 +75,7 @@ export class OpenfinService {
   }
 
   disconnected(runtime: string) {
-    this.runtimes[runtime].observable.next({ version: null });
+    //this.runtimes[runtime].observable.next({ version: null });
   }
 
   subscribed(runtime: string, targetUuid: string, uuid: string, topic: string, message: string) {

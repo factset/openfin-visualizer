@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
   MatSidenavModule,
@@ -46,6 +46,7 @@ import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.compone
     BrowserAnimationsModule,
     NoopAnimationsModule, // disable animations for now
     FormsModule,
+    ReactiveFormsModule,
     MatSidenavModule,
     MatTabsModule,
     MatButtonModule,

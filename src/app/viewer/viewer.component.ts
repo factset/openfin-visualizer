@@ -185,11 +185,14 @@ export class ViewerComponent implements OnInit {
   template: `
     <h1 mat-dialog-title>Add JSON</h1>
     <div mat-dialog-content>
-      <json-editor [options]="editorOptions" [data]="data" (change)="getData($event)"></json-editor>
+      <json-editor
+          [options]="editorOptions"
+          [data]="data">
+      </json-editor>
     </div>
     <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()">Cancel</button>
-      <button mat-button (click)="onClick()" cdkFocusInitial>Ok</button>
+      <button mat-button (click)="onNoClick()" cdkFocusInitial>Cancel</button>
+      <button mat-button (click)="onClick()" [disabled]="invalid">Ok</button>
       <button mat-button (click)="onCopy()" style="margin-left: auto;">Copy</button>
     </div>
   `,
@@ -201,16 +204,26 @@ export class AddJsonDialogComponent {
 
   editorOptions: JsonEditorOptions;
   json: any;
+  invalid: boolean = false;
 
   constructor(public dialogRef: MatDialogRef<AddJsonDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: DialogData,
-              public _clipboardService: ClipboardService) {
+              public _clipboardService: ClipboardService,
+              public zone: NgZone) {
     this.editorOptions = new JsonEditorOptions();
-    this.editorOptions.modes = ['code', 'text', 'tree', 'view']; // set all allowed modes
-  }
-
-  getData(event): void {
-    this.json = event;
+    this.editorOptions.modes = ['code', 'tree', 'view'];
+    this.invalid = !this.data;
+    this.json = this.data;
+    this.editorOptions.onChange = () => {
+      this.zone.run(() => {
+        try {
+          this.json = this.editor.get();
+          this.invalid = false;
+        } catch {
+          this.invalid = true;
+        }
+      });
+    }
   }
 
   onClick(): void {

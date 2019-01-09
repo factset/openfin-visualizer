@@ -13,15 +13,10 @@ import {
   MAT_DIALOG_DATA,
   MatSnackBar
 } from '@angular/material';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
 import { OpenfinService } from '../openfin.service';
-
-export interface DialogData {
-  uuid: string;
-  topic: string;
-}
 
 @Component({
   selector: 'app-tabs-container',
@@ -84,17 +79,21 @@ export class TabsContainerComponent implements OnInit {
   template: `
     <h1 mat-dialog-title>Add Topic</h1>
     <div mat-dialog-content>
-      <p>Enter a uuid and topic</p>
-      <mat-form-field>
-        <input matInput placeholder="Enter UUID" [(ngModel)]="uuid">
+      <p>Enter a UUID and topic</p>
+      <mat-form-field style="margin-bottom: 15px;">
+        <input matInput placeholder="Enter UUID" [(ngModel)]="uuid" />
+        <mat-hint>Leave blank for all</mat-hint>
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Enter topic" [(ngModel)]="topic">
+        <input matInput placeholder="Enter topic" [(ngModel)]="topic" [formControl]="topicFormControl" />
+        <mat-error *ngIf="topicFormControl.hasError('required')">
+          Topic is <strong>required</strong>
+        </mat-error>
       </mat-form-field>
     </div>
     <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()">No Thanks</button>
-      <button mat-button (click)="onClick()" cdkFocusInitial>Ok</button>
+      <button mat-button (click)="onNoClick()" cdkFocusInitial>Cancel</button>
+      <button mat-button (click)="onClick()" [disabled]="topicFormControl.hasError('required')">Ok</button>
     </div>
   `,
   styleUrls: ['./tabs-container.component.css']
@@ -103,13 +102,18 @@ export class AddTabDialogComponent {
 
   uuid: string = '';
   topic: string = '';
+  topicFormControl = new FormControl('', [
+    Validators.required
+  ]);
 
-  constructor(public dialogRef: MatDialogRef<AddTabDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: DialogData) {
+  constructor(public dialogRef: MatDialogRef<AddTabDialogComponent>) {
   }
 
   onClick(): void {
-    this.dialogRef.close({ uuid: this.uuid, topic: this.topic });
+    this.dialogRef.close({
+      uuid: this.uuid ? this.uuid : '*',
+      topic: this.topic
+    });
   }
 
   onNoClick(): void {

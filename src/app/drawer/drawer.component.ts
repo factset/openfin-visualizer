@@ -22,12 +22,10 @@ export interface DialogData {
 export class DrawerComponent implements OnInit {
 
   opened: boolean = true;
-  channels: any = [
-    { runtime: 'Stable', options: {}, version: '12.5.2.3' }
-  ];
+  channels: any = [];
   version: string;
   runtime: string;
-  options: {};
+  options: any = {};
   activeChannel: string;
   timeout: any;
 
@@ -70,14 +68,17 @@ export class DrawerComponent implements OnInit {
 
   removeChannel(event, index: number) {
     event.stopPropagation();
-    // TODO* call disconnect in openfin service
-    this.channels.splice(index, 1);
+    let channel = this.channels.splice(index, 1)[0];
+    this.openfin.disconnect(channel.runtime);
     this.activeChannel = this.channels.length > 0 ? this.channels[length - 1] : null;
   }
 
   removeAllChannels() {
     event.stopPropagation();
-    // TODO* call disconnect for each channel
+    this.channels.forEach(channel => {
+      this.openfin.disconnect(channel.runtime);
+    });
+    this.channels = [];
   }
 
   setActive(runtime: string) {
@@ -102,8 +103,8 @@ export class DrawerComponent implements OnInit {
       </mat-form-field>
     </div>
     <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()">Cancel</button>
-      <button mat-button (click)="onClick()" cdkFocusInitial>Ok</button>
+      <button mat-button (click)="onNoClick()" cdkFocusInitial>Cancel</button>
+      <button mat-button (click)="onClick()">Ok</button>
     </div>
   `,
   styleUrls: ['./drawer.component.css']

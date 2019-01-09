@@ -13,7 +13,7 @@ ipcMain.on('openfin-connect', async (event, data) => {
 });
 
 ipcMain.on('openfin-disconnect', async (event, data) => {
-  let version = await Disconnect(data.runtime);
+  await Disconnect(data.runtime);
   event.sender.send('openfin-disconnected', { runtime: data.runtime });
 });
 
@@ -56,10 +56,10 @@ async function Disconnect(runtime) {
   let fin = runtimes[runtime];
   await fin.System.exit(() => {
     console.log(`Disconnected from OpenFin runtime ${runtime}`);
-    return runtime;
+    //return runtime;
   }, err => {
     console.log(err);
-    return runtime;
+    //return runtime;
   });
 }
 
