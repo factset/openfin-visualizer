@@ -75,9 +75,7 @@ export class DrawerComponent implements OnInit {
 
   removeAllChannels() {
     event.stopPropagation();
-    this.channels.forEach(channel => {
-      this.openfin.disconnect(channel.runtime);
-    });
+    this.openfin.disconnectAll();
     this.channels = [];
   }
 

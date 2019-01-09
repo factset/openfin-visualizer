@@ -22,6 +22,10 @@ export class OpenfinService {
       this.disconnected(data.runtime);
     });
 
+    this.ipc.on('openfin-disconnected-all', event => {
+      this.disconnectedAll();
+    })
+
     this.ipc.on('openfin-subscribed', (event, data) => {
       console.log('Received data: ' + data);
       this.subscribed(data.runtime, data.targetUuid, data.uuid, data.topic, data.message);
@@ -41,12 +45,9 @@ export class OpenfinService {
     this.ipc.send('openfin-disconnect', { runtime: runtime });
   }
 
-  /*disconnectAll() {
-    for (let runtime in this.runtimes) {
-      this.disconnects[runtime] = new Subject<any>();
-      this.ipc.send('openfin-disconnect', { runtime: runtime });
-    }
-  }*/
+  disconnectAll() {
+    this.ipc.send('openfin-disconnect-all');
+  }
 
   subscribe(runtime: string, uuid: string, topic: string): Observable<any> {
     this.runtimes[runtime].topics[topic] = {};
@@ -76,6 +77,10 @@ export class OpenfinService {
 
   disconnected(runtime: string) {
     //this.runtimes[runtime].observable.next({ version: null });
+  }
+
+  disconnectedAll() {
+    
   }
 
   subscribed(runtime: string, targetUuid: string, uuid: string, topic: string, message: string) {

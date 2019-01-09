@@ -17,15 +17,12 @@ ipcMain.on('openfin-disconnect', async (event, data) => {
   event.sender.send('openfin-disconnected', { runtime: data.runtime });
 });
 
-/*ipcMain.on('openfin-disconnect-all', async event => {
-  // TODO* utilize already existing exports
+ipcMain.on('openfin-disconnect-all', async event => {
   for (let runtime in runtimes) {
-    // Await disconnect call to ensure OpenFin receives the command
     console.log(`Disconnecting from ${runtime}`);
     await Disconnect(runtime);
   }
-  event.sender.send('openfin-disconnected-all');
-});*/
+});
 
 ipcMain.on('openfin-subscribe', async (event, data) => {
   await Subscribe(event.sender, data.runtime, data.uuid, data.topic);

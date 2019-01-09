@@ -23,6 +23,8 @@ const createWindow = () => {
 
     win.webContents.openDevTools({ mode: 'bottom' });
 
+    win.webContents.on('did-navigate', event => openfin.disconnectAll());
+
     win.on('close', () => openfin.disconnectAll());
 
     win.on('closed', () => {
