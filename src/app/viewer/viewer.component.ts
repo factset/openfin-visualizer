@@ -2,7 +2,9 @@ import {
   Component,
   OnInit,
   AfterViewInit,
+  Output,
   Input,
+  EventEmitter,
   Inject,
   ViewChild,
   ViewChildren,
@@ -31,10 +33,13 @@ export class ViewerComponent implements OnInit {
   @Input() runtime: string;
   @Input() uuid: string;
   @Input() topic: string;
+  @Input() selected: boolean;
   @ViewChild('viewerLog') viewerLog: ElementRef;
   @ViewChildren('messageItems') messageItems: QueryList<any>;
 
-  data: any;
+  @Output() onReceive: EventEmitter<any> = new EventEmitter<any>();
+
+  unread: number = 0;
   message: string = '';
   dateOptions: any = {
     weekday: 'long',
@@ -80,8 +85,6 @@ export class ViewerComponent implements OnInit {
   subscribe() {
     this.openfin.subscribe(this.runtime, this.uuid, this.topic).subscribe(data => {
       this.zone.run(() => {
-        console.log(data.sender.uuid + ' : ' + data.message); // sender -> uuid, name
-        // add to message items
         if (!this.participants.hasOwnProperty(data.sender.uuid)) {
           this.participants[data.sender.uuid] = {
             name: data.sender.name ? data.sender.name : data.sender.uuid,
@@ -96,6 +99,14 @@ export class ViewerComponent implements OnInit {
           datetime: new Date().toLocaleString('en-US'), // TODO* get time from OF object
           content: data.message
         });
+
+        if (!this.selected) {
+          this.onReceive.emit({
+            runtime: this.runtime,
+            topic: this.topic,
+            unread: ++this.unread
+          });
+        }
       });
     });
   }
@@ -142,14 +153,35 @@ export class ViewerComponent implements OnInit {
     });
   }
 
+  viewParticipant(name: string) {
+    let participant = {
+      messages: this.messages.filter(m => m.participant === name),
+      info: this.participants[name]
+    };
+
+    const pDialogRef = this.dialog.open(ViewParticipantDialogComponent, {
+      width: '40%',
+      data: participant
+    });
+  }
+
   scrollToEnd() {
     this.viewerLog.nativeElement.scrollTop = this.viewerLog.nativeElement.scrollHeight;
   }
 
+  // On focus from different tab
   waitScrollToEnd() {
     setTimeout(() => {
       this.scrollToEnd();
     }, 0);
+
+    if (!this.selected) {
+      this.onReceive.emit({
+        runtime: this.runtime,
+        topic: this.topic,
+        unread: this.unread > 0 ? --this.unread : 0
+      });
+    }
   }
 
   onKey(event: any) {
@@ -236,6 +268,56 @@ export class AddJsonDialogComponent {
 
   onCopy(): void {
     this._clipboardService.copyFromContent(JSON.stringify(this.json));
+  }
+
+}
+
+@Component({
+  selector: 'app-view-participant-dialog',
+  template: `
+    <div class="participant-dialog-header">
+      <div
+          class="participant-icon-container participant-dialog-icon-container"
+          [ngStyle]="{ 'background': data.info.color }">
+        <mat-icon class="participant-icon">desktop_windows</mat-icon>
+      </div>
+      <h1 mat-dialog-title style="margin: 0 0 0 10px">
+        {{ data.info.name }}
+      </h1>
+    </div>
+
+    <div mat-dialog-content>
+      <div class="participant-dialog-info-list">
+        <div class="participant-dialog-info-item">
+          First met: {{ data.messages[0].datetime }}
+        </div>
+        <div class="participant-dialog-info-item">
+          Last seen: {{ data.messages[data.messages.length-1].datetime }}
+        </div>
+      </div>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onClick()" cdkFocusInitial>Close</button>
+      <button mat-button (click)="onMessage()" style="margin-left: auto;">Message</button>
+    </div>
+  `,
+  styleUrls: ['./viewer.component.css']
+})
+export class ViewParticipantDialogComponent {
+
+  
+
+  constructor(public dialogRef: MatDialogRef<ViewParticipantDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: DialogData,
+              public openfin: OpenfinService) {
+  }
+
+  onClick(): void {
+    this.dialogRef.close();
+  }
+
+  onMessage(): void {
+
   }
 
 }

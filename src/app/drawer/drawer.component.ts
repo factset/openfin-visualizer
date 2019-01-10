@@ -1,17 +1,24 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 import {
   MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
-  MatSnackBar
+  MatSnackBar,
+  MatSidenav
 } from '@angular/material';
 
 import { Subscription } from 'rxjs';
 import { OpenfinService } from '../openfin.service';
 
 export interface DialogData {
-  runtime: string;
-  options: any;
+  channels: Array<any>;
 }
 
 @Component({
@@ -21,11 +28,11 @@ export interface DialogData {
 })
 export class DrawerComponent implements OnInit {
 
+  @ViewChild('sidenav') sidenav: MatSidenav;
+
   opened: boolean = true;
-  channels: any = [];
+  channels: Array<any> = [];
   version: string;
-  runtime: string;
-  options: any = {};
   activeChannel: string;
   timeout: any;
 
@@ -39,7 +46,8 @@ export class DrawerComponent implements OnInit {
 
   addChannel() {
     const dialogRef = this.dialog.open(AddVersionDialogComponent, {
-      width: '250px'
+      width: '250px',
+      data: { channels: this.channels }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -47,21 +55,11 @@ export class DrawerComponent implements OnInit {
         this.channels.push({ runtime: result.runtime, options: {} });
 
         let connection = this.openfin.connect(result.runtime).subscribe(version => {
-          clearTimeout(this.timeout);
           let channel = this.channels.find(c => c.runtime === result.runtime);
-          channel.version = version;
+          channel.version = version.version;
           this.activeChannel = result.runtime;
           this.cd.detectChanges(); // force update to page
         });
-
-        // Timeout after 5 seconds of not connecting
-        this.timeout = setTimeout(() => {
-          this.channels.pop(); // remove faulty channel
-          connection.unsubscribe();
-          this.snackbar.open(`Could not connect to channel: ${result.runtime}`, 'Dismiss', {
-            duration: 5000
-          });
-        }, 5000);
       }
     });
   }
@@ -85,6 +83,14 @@ export class DrawerComponent implements OnInit {
     }
   }
 
+  tabsModified(data) {
+    if (!this.sidenav.opened && data.tabs.length === 0) {
+      this.sidenav.open();
+    } else if (this.sidenav.opened && data.tabs.length >= 0) {
+      this.sidenav.close();
+    }
+  }
+
 }
 
 @Component({
@@ -93,7 +99,7 @@ export class DrawerComponent implements OnInit {
     <h1 mat-dialog-title>Connect to OpenFin</h1>
     <div mat-dialog-content>
       <mat-form-field>
-        <mat-select placeholder="Select channel" [(value)]="selected">
+        <mat-select placeholder="Channel" [(value)]="selected">
           <mat-option *ngFor="let runtime of runtimes" [value]="runtime">
             {{ runtime }}
           </mat-option>
@@ -124,6 +130,13 @@ export class AddVersionDialogComponent {
 
   constructor(public dialogRef: MatDialogRef<AddVersionDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: DialogData) {
+    this.runtimes = this.runtimes.filter(runtime => {
+      return !data.channels.find(channel => {
+        return channel.runtime === runtime;
+      });
+    });
+
+    this.selected = this.runtimes[0]; // auto-select first runtime
   }
 
   onClick(): void {

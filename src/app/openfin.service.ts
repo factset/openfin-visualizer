@@ -27,7 +27,6 @@ export class OpenfinService {
     })
 
     this.ipc.on('openfin-subscribed', (event, data) => {
-      console.log('Received data: ' + data);
       this.subscribed(data.runtime, data.targetUuid, data.uuid, data.topic, data.message);
     });
   }
@@ -80,7 +79,7 @@ export class OpenfinService {
   }
 
   disconnectedAll() {
-    
+
   }
 
   subscribed(runtime: string, targetUuid: string, uuid: string, topic: string, message: string) {

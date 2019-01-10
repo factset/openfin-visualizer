@@ -27,22 +27,16 @@ const createWindow = () => {
 
     win.on('close', () => openfin.disconnectAll());
 
-    win.on('closed', () => {
-      win = null;
-    });
+    win.on('closed', () => win = null);
   }, 10000);
 }
 
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('activate', () => {
-  if (win === null) {
-    createWindow();
-  }
+  if (win === null) createWindow();
 });

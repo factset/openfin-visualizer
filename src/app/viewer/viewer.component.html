@@ -9,7 +9,11 @@
   </div>
 
   <mat-card class="viewer-log-container">
-    <mat-card-title class="viewer-log-title">{{ topic }}</mat-card-title>
+    <mat-card-title class="viewer-log-title">
+      {{ topic }}
+      <div class="viewer-log-subtitle">{{ runtime }}</div>
+    </mat-card-title>
+
     <div class="viewer-log-divider"></div>
     <mat-card-content #viewerLog class="viewer-log">
       <div
@@ -21,7 +25,8 @@
             class="participant-icon-container"
             [ngStyle]="{ 'background': getParticipantColor(message.participant) }"
             [matTooltip]="message.participant"
-            [matTooltipPosition]="'below'">
+            [matTooltipPosition]="'below'"
+            (click)="viewParticipant(message.participant)">
           <mat-icon
               *ngIf="message.participant !== selfUuid"
               class="participant-icon"

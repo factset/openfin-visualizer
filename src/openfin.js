@@ -42,22 +42,27 @@ async function Connect(runtime) {
     runtime: { version: runtime }
   };
 
-  let fin = await connect(options).catch(err => console.error(err));
-  let version = await fin.System.getVersion();
-  runtimes[runtime] = fin;
-  console.log(`Connected to OpenFin version ${version} with runtime ${runtime}`);
+  let version;
+  try {
+    let fin = await connect(options);
+    version = await fin.System.getVersion();
+    runtimes[runtime] = fin;
+    console.log(`Connected to OpenFin version ${version} with runtime ${runtime}`);
+  } catch(e) {
+    console.log(e);
+  }
   return version;
 }
 
 async function Disconnect(runtime) {
-  let fin = runtimes[runtime];
-  await fin.System.exit(() => {
+  try {
+    let fin = runtimes[runtime];
+    await fin.System.exit();
     console.log(`Disconnected from OpenFin runtime ${runtime}`);
-    //return runtime;
-  }, err => {
-    console.log(err);
-    //return runtime;
-  });
+    delete runtimes[runtime];
+  } catch(e) {
+    console.log(e);
+  }
 }
 
 async function Subscribe(sender, runtime, targetUuid, topic) {

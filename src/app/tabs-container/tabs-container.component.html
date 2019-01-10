@@ -1,4 +1,13 @@
 <div id="tabs-container">
+  <div id="tabs-init">
+    <div *ngIf="!chosenRuntime">
+      Add a channel in order to add topics.
+    </div>
+    <div *ngIf="chosenRuntime && tabs.length === 0">
+      Add a topic to view activity on the selected topic.
+    </div>
+  </div>
+
   <div id="add-button" [ngClass]="{ 'add-button-disabled': !chosenRuntime }">
     <button
         mat-icon-button
@@ -8,15 +17,25 @@
       <mat-icon aria-label="Add tab">add</mat-icon>
     </button>
   </div>
-  <mat-tab-group id="tabs" [selectedIndex]="selected.value" (selectedIndexChange)="changeSelected($event)">
+  <mat-tab-group
+      id="tabs"
+      [selectedIndex]="selected.value"
+      (selectedIndexChange)="changeSelected($event)">
     <mat-tab *ngFor="let tab of tabs; let index = index">
       <ng-template matTabLabel>
-        {{tab.label}}
-        <mat-icon aria-label="Remove tab" id="remove-tab" (click)="removeTab($event, index)">
+        <div [ngClass]="{ 'tab-unread': tab.unread > 0 }">{{ tab.label }}</div>
+        <mat-icon aria-label="Remove tab" class="remove-tab" (click)="removeTab($event, index)">
           clear
         </mat-icon>
       </ng-template>
-      <app-viewer #appViewer [runtime]="tab.runtime" [uuid]="tab.uuid" [topic]="tab.topic"></app-viewer>
+      <app-viewer
+          #appViewer
+          [runtime]="tab.runtime"
+          [uuid]="tab.uuid"
+          [topic]="tab.topic"
+          [selected]="selected.value === index"
+          (onReceive)="setUnread($event)">
+        </app-viewer>
     </mat-tab>
   </mat-tab-group>
 </div>

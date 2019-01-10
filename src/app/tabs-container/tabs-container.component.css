@@ -2,6 +2,21 @@
   height: 100%;
 }
 
+#tabs-init {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+.tab-unread {
+  font-style: italic;
+  font-weight: bold;
+  color: #FFD54F; /* was #2196F3 */
+}
+
 #add-button {
   position: absolute;
   top: 0;
@@ -31,7 +46,7 @@
   color: rgba(0, 0, 0, 0.12) !important;
 }
 
-#remove-tab {
+.remove-tab {
   position: absolute;
   display: flex;
   justify-content: center;
@@ -43,7 +58,7 @@
   border-radius: 50%;
 }
 
-#remove-tab:hover {
+.remove-tab:hover {
   cursor: pointer;
   background: rgba(256, 0, 0, 0.50);
 }

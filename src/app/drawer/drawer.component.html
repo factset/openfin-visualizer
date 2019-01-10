@@ -1,7 +1,15 @@
 <mat-drawer-container id="container">
   <mat-drawer #sidenav id="sidenav" mode="side" [(opened)]="opened">
-    <mat-list>
-      <h3 mat-subheader>OpenFin Channels</h3>
+    <div id="sidenav-header">OpenFin Channels</div>
+    <button
+        mat-raised-button
+        color="primary"
+        id="channel-init"
+        *ngIf="channels.length === 0"
+        (click)="addChannel($event)">
+      Add channel
+    </button>
+    <mat-list *ngIf="channels.length > 0">
       <mat-list-item
           class="channel-item"
           [ngClass]="{ 'channel-item-active' : channel.runtime === activeChannel, 'channel-item-disabled' : !channel.hasOwnProperty('version') }"
@@ -23,10 +31,20 @@
         </mat-icon>
       </mat-list-item>
     </mat-list>
-    <button mat-icon-button id="remove-all-channels" matTooltip="remove all" (click)="removeAllChannels()">
+    <button
+        mat-icon-button
+        id="remove-all-channels"
+        matTooltip="remove all"
+        *ngIf="channels.length > 0"
+        (click)="removeAllChannels()">
       <mat-icon aria-label="Remove all channels">delete_sweep</mat-icon>
     </button>
-    <button mat-icon-button id="add-channel" matTooltip="add channel" (click)="addChannel($event)">
+    <button
+        mat-icon-button
+        id="add-channel"
+        matTooltip="add channel"
+        *ngIf="channels.length > 0"
+        (click)="addChannel($event)">
       <mat-icon aria-label="Add channel">add</mat-icon>
     </button>
   </mat-drawer>
@@ -36,6 +54,6 @@
       <mat-icon aria-label="Expand drawer" *ngIf="!opened">keyboard_arrow_right</mat-icon>
       <mat-icon aria-label="Collapse drawer" *ngIf="opened">keyboard_arrow_left</mat-icon>
     </button>
-    <app-tabs-container [chosenRuntime]="activeChannel"></app-tabs-container>
+    <app-tabs-container [chosenRuntime]="activeChannel" (onModify)="tabsModified($event)"></app-tabs-container>
   </mat-drawer-content>
 </mat-drawer-container>

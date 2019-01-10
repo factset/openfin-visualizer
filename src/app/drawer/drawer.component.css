@@ -2,9 +2,15 @@
   height: 100%;
 }
 
-#sidenav {
-  /*padding-left: 10px;
-  padding-right: 10px;*/
+#sidenav-header {
+  padding: 16px;
+}
+
+#channel-init {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #drawer-toggle {

@@ -24,6 +24,13 @@
   flex: 0 0 auto;
 }
 
+.viewer-log-subtitle {
+  display: inline;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-left: 4px;
+}
+
 .viewer-log-divider {
   flex: 0 0 auto;
   height: 1px;
@@ -59,6 +66,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
+}
+
+.participant-icon-container:hover {
+  cursor: pointer;
+}
+
+.participant-dialog-icon-container:hover {
+  cursor: default !important;
 }
 
 .participant-icon {
@@ -133,4 +149,11 @@
 .viewer-response-input:focus {
   outline: none;
   border-bottom: 1px solid #2196f3;
+}
+
+.participant-dialog-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
 }

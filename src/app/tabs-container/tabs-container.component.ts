@@ -2,7 +2,9 @@ import {
   Component,
   OnInit,
   Inject,
+  Output,
   Input,
+  EventEmitter,
   ViewChildren,
   ElementRef,
   QueryList
@@ -18,6 +20,10 @@ import { FormControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { OpenfinService } from '../openfin.service';
 
+export interface DialogData {
+  runtime: string;
+}
+
 @Component({
   selector: 'app-tabs-container',
   templateUrl: './tabs-container.component.html',
@@ -28,13 +34,12 @@ export class TabsContainerComponent implements OnInit {
   @Input() chosenRuntime: string;
   @ViewChildren('appViewer') appViewers: QueryList<any>;
 
-  tabs: any = [
-    //{ label: 'Test', runtime: 'stable', uuid: '*', topic: 'symbol-topic' }
-  ];
+  @Output() onModify: EventEmitter<any> = new EventEmitter<any>();
+
+  tabs: any = [];
   selected = new FormControl(0);
 
-  uuid: string;
-  topic: string;
+  runtime: string;
 
   constructor(public dialog: MatDialog) { }
 
@@ -43,7 +48,8 @@ export class TabsContainerComponent implements OnInit {
 
   addTab() {
     const dialogRef = this.dialog.open(AddTabDialogComponent, {
-      width: '250px'
+      width: '250px',
+      data: this.chosenRuntime
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -52,10 +58,12 @@ export class TabsContainerComponent implements OnInit {
           label: result.topic,
           runtime: this.chosenRuntime,
           uuid: result.uuid,
-          topic: result.topic
+          topic: result.topic,
+          unread: 0
         });
 
         this.selected.setValue(this.tabs.length - 1);
+        this.onModify.emit({ tabs: this.tabs });
       }
     });
   }
@@ -63,13 +71,22 @@ export class TabsContainerComponent implements OnInit {
   removeTab(event, index: number) {
     event.stopPropagation();
     this.tabs.splice(index, 1);
+    this.onModify.emit({ tabs: this.tabs });
   }
 
-  changeSelected(event) {
-    if (this.appViewers) {
-      this.selected.setValue(event);
-      this.appViewers.toArray()[event].waitScrollToEnd();
+  changeSelected(index) {
+    let viewers = this.appViewers.toArray();
+    if (viewers.length > 0) {
+      this.selected.setValue(index);
+      viewers[index].waitScrollToEnd();
     }
+  }
+
+  setUnread(data) {
+    let tab = this.tabs.find(t => {
+      return t.topic === data.topic && t.runtime === data.runtime;
+    });
+    tab.unread = data.unread;
   }
 
 }
@@ -81,11 +98,14 @@ export class TabsContainerComponent implements OnInit {
     <div mat-dialog-content>
       <p>Enter a UUID and topic</p>
       <mat-form-field style="margin-bottom: 15px;">
-        <input matInput placeholder="Enter UUID" [(ngModel)]="uuid" />
+        <input matInput placeholder="Channel" [value]="data" disabled />
+      </mat-form-field>
+      <mat-form-field style="margin-bottom: 15px;">
+        <input matInput placeholder="UUID" [(ngModel)]="uuid" />
         <mat-hint>Leave blank for all</mat-hint>
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Enter topic" [(ngModel)]="topic" [formControl]="topicFormControl" />
+        <input matInput placeholder="Topic" [(ngModel)]="topic" [formControl]="topicFormControl" />
         <mat-error *ngIf="topicFormControl.hasError('required')">
           Topic is <strong>required</strong>
         </mat-error>
@@ -106,7 +126,8 @@ export class AddTabDialogComponent {
     Validators.required
   ]);
 
-  constructor(public dialogRef: MatDialogRef<AddTabDialogComponent>) {
+  constructor(public dialogRef: MatDialogRef<AddTabDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: DialogData) {
   }
 
   onClick(): void {

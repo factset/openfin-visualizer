@@ -26,7 +26,7 @@ import { ClipboardModule } from 'ngx-clipboard';
 import { AppComponent } from './app.component';
 import { DrawerComponent, AddVersionDialogComponent } from './drawer/drawer.component';
 import { TabsContainerComponent, AddTabDialogComponent } from './tabs-container/tabs-container.component';
-import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.component';
+import { ViewerComponent, AddJsonDialogComponent, ViewParticipantDialogComponent } from './viewer/viewer.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +36,8 @@ import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.compone
     AddTabDialogComponent,
     AddVersionDialogComponent,
     ViewerComponent,
-    AddJsonDialogComponent
+    AddJsonDialogComponent,
+    ViewParticipantDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +64,8 @@ import { ViewerComponent, AddJsonDialogComponent } from './viewer/viewer.compone
   entryComponents: [
     AddTabDialogComponent,
     AddVersionDialogComponent,
-    AddJsonDialogComponent
+    AddJsonDialogComponent,
+    ViewParticipantDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
