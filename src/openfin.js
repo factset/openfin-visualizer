@@ -4,6 +4,7 @@ const { connect } = require('hadouken-js-adapter');
 exports = module.exports = new OpenFin();
 
 let runtimes = {};
+let subscriptions = {};
 let processes = {};
 
 function OpenFin() {}
@@ -19,14 +20,20 @@ ipcMain.on('openfin-disconnect', async (event, data) => {
 });
 
 ipcMain.on('openfin-disconnect-all', async event => {
-  for (let runtime in runtimes) {
-    console.log(`Disconnecting from ${runtime}`);
-    await Disconnect(runtime);
-  }
+  await exports.disconnectAll();
 });
 
 ipcMain.on('openfin-subscribe', async (event, data) => {
   await Subscribe(event.sender, data.runtime, data.uuid, data.topic);
+});
+
+ipcMain.on('openfin-unsubscribe', async (event, data) => {
+  await Unsubscribe(data.runtime, data.uuid, data.topic);
+  event.sender.send('openfin-unsubscribed', { runtime: data.runtime, uuid: data.uuid, topic: data.topic });
+});
+
+ipcMain.on('openfin-unsubscribe-all', async (event, data) => {
+  // TODO* find a way to unsubscribe from all
 });
 
 ipcMain.on('openfin-publish', async (event, data) => {
@@ -80,10 +87,27 @@ async function Subscribe(sender, runtime, targetUuid, topic) {
     });
   }).then(() => {
     console.log(`Subscribed to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+
+    // Destroy subscription
+    if (!subscriptions.hasOwnProperty(runtime)) subscriptions[runtime] = [];
+    subscriptions[runtime].push({ uuid: targetUuid, topic: topic });
   }).catch(err => {
     console.log(err);
     sender.send('openfin-subscribe-error', { data: err });
   });
+}
+
+async function Unsubscribe(runtime, targetUuid, topic) {
+  try {
+    await runtimes[runtime].InterApplicationBus.unsubscribe({ uuid: targetUuid }, topic, () => {});
+    console.log(`Unsubscribed from uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+    subscriptions[runtime] = subscriptions[runtime].filter(s => {
+      return s.uuid !== targetUuid && s.topic !== topic;
+    });
+    if (subscriptions[runtime].length === 0) delete subscriptions[runtime];
+  } catch(e) {
+    console.log(e);
+  }
 }
 
 async function Publish(sender, runtime, topic, data) {

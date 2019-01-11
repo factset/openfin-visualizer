@@ -10,7 +10,8 @@ import {
   ViewChildren,
   ElementRef,
   QueryList,
-  NgZone
+  NgZone,
+  OnDestroy
 } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
@@ -34,7 +35,7 @@ export interface ParticipantDialogData {
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.css']
 })
-export class ViewerComponent implements OnInit {
+export class ViewerComponent implements OnInit, OnDestroy {
 
   @Input() runtime: string;
   @Input() uuid: string;
@@ -46,6 +47,7 @@ export class ViewerComponent implements OnInit {
   @Output() onReceive: EventEmitter<any> = new EventEmitter<any>();
   @Output() onNewTab: EventEmitter<any> = new EventEmitter<any>();
 
+  subscription: Subscription;
   unread: number = 0;
   message: string = '';
   dateOptions: any = {
@@ -89,8 +91,12 @@ export class ViewerComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
   subscribe() {
-    this.openfin.subscribe(this.runtime, this.uuid, this.topic).subscribe(data => {
+    this.subscription = this.openfin.subscribe(this.runtime, this.uuid, this.topic).subscribe(data => {
       this.zone.run(() => {
         if (!this.participants.hasOwnProperty(data.sender.uuid)) {
           this.participants[data.sender.uuid] = {

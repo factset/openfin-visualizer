@@ -29,6 +29,10 @@ export class OpenfinService {
       this.subscribed(data.runtime, data.targetUuid, data.uuid, data.topic, data.message);
     });
 
+    this.ipc.on('openfin-unsubscribed', (event, data) => {
+      this.unsubscribed(data.runtime, data.uuid, data.topic);
+    });
+
     this.ipc.on('openfin-got-process', (event, data) => {
       console.log(data);
       this.processReceived(data.runtime, data.uuid, data.info);
@@ -80,7 +84,6 @@ export class OpenfinService {
   getProcess(runtime: string, uuid: string): Observable<any> {
     this.runtimes[runtime].info[uuid] = new Subject<any>();
     this.ipc.send('openfin-get-process', { runtime: runtime, uuid: uuid });
-    console.log('shot off message');
     return this.runtimes[runtime].info[uuid].asObservable();
   }
 
@@ -92,10 +95,11 @@ export class OpenfinService {
 
   disconnected(runtime: string) {
     //this.runtimes[runtime].observable.next({ version: null });
+    delete this.runtimes[runtime];
   }
 
   disconnectedAll() {
-
+    this.runtimes = {};
   }
 
   subscribed(runtime: string, targetUuid: string, uuid: string, topic: string, message: string) {
@@ -103,6 +107,13 @@ export class OpenfinService {
       sender: uuid,
       message: message
     });
+  }
+
+  unsubscribed(runtime: string, uuid: string, topic: string) {
+    delete this.runtimes[runtime].topics[topic][uuid];
+    if (Object.keys(this.runtimes[runtime].topics[topic]).length === 0) {
+      delete this.runtimes[runtime].topics[topic];
+    }
   }
 
   processReceived(runtime: string, uuid: string, info: any) {

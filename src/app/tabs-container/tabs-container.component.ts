@@ -41,7 +41,8 @@ export class TabsContainerComponent implements OnInit {
 
   runtime: string;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public dialog: MatDialog,
+              public openfin: OpenfinService) { }
 
   ngOnInit() {
   }
@@ -70,7 +71,8 @@ export class TabsContainerComponent implements OnInit {
 
   removeTab(event, index: number) {
     event.stopPropagation();
-    this.tabs.splice(index, 1);
+    let tab = this.tabs.splice(index, 1)[0];
+    this.openfin.unsubscribe(tab.runtime, tab.uuid, tab.topic);
     this.onModify.emit({ tabs: this.tabs });
   }
 
