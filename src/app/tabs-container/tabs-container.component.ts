@@ -124,7 +124,7 @@ export class TabsContainerComponent implements OnInit {
         <input matInput placeholder="Channel" [value]="data" disabled />
       </mat-form-field>
       <mat-form-field style="margin-bottom: 15px;">
-        <input matInput placeholder="UUID" [(ngModel)]="uuid" />
+        <input matInput placeholder="UUID" [(ngModel)]="uuid" cdkFocusInitial />
         <mat-hint>Leave blank for all</mat-hint>
       </mat-form-field>
       <mat-form-field>
@@ -135,7 +135,7 @@ export class TabsContainerComponent implements OnInit {
       </mat-form-field>
     </div>
     <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()" cdkFocusInitial>Cancel</button>
+      <button mat-button (click)="onNoClick()">Cancel</button>
       <button mat-button (click)="onClick()" [disabled]="topicFormControl.hasError('required')">Ok</button>
     </div>
   `,

@@ -107,8 +107,8 @@ export class DrawerComponent implements OnInit {
       </mat-form-field>
     </div>
     <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()" cdkFocusInitial>Cancel</button>
-      <button mat-button (click)="onClick()">Ok</button>
+      <button mat-button (click)="onNoClick()">Cancel</button>
+      <button mat-button (click)="onClick()" cdkFocusInitial>Ok</button>
     </div>
   `,
   styleUrls: ['./drawer.component.css']

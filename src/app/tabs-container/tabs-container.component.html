@@ -19,6 +19,7 @@
   </div>
   <mat-tab-group
       id="tabs"
+      animationDuration="300ms"
       [selectedIndex]="selected.value"
       (selectedIndexChange)="changeSelected($event)">
     <mat-tab *ngFor="let tab of tabs; let index = index">

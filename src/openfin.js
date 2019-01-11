@@ -88,7 +88,7 @@ async function Subscribe(sender, runtime, targetUuid, topic) {
   }).then(() => {
     console.log(`Subscribed to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
 
-    // Destroy subscription
+    // Push subscription
     if (!subscriptions.hasOwnProperty(runtime)) subscriptions[runtime] = [];
     subscriptions[runtime].push({ uuid: targetUuid, topic: topic });
   }).catch(err => {
@@ -101,8 +101,10 @@ async function Unsubscribe(runtime, targetUuid, topic) {
   try {
     await runtimes[runtime].InterApplicationBus.unsubscribe({ uuid: targetUuid }, topic, () => {});
     console.log(`Unsubscribed from uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+
+    // Destroy subscription
     subscriptions[runtime] = subscriptions[runtime].filter(s => {
-      return s.uuid !== targetUuid && s.topic !== topic;
+      return s.uuid !== targetUuid || s.topic !== topic;
     });
     if (subscriptions[runtime].length === 0) delete subscriptions[runtime];
   } catch(e) {

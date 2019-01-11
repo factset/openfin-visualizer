@@ -45,7 +45,7 @@ import { ViewerComponent, AddJsonDialogComponent, ViewParticipantDialogComponent
     NgxElectronModule,
     ClipboardModule,
     BrowserAnimationsModule,
-    NoopAnimationsModule, // disable animations for now
+    //NoopAnimationsModule, // disable animations for now
     FormsModule,
     ReactiveFormsModule,
     MatSidenavModule,

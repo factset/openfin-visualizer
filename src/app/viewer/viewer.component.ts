@@ -339,7 +339,7 @@ export class AddJsonDialogComponent {
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="onClick()" cdkFocusInitial>Close</button>
-      <button mat-button (click)="onMessage()" style="margin-left: auto;">Message</button>
+      <button mat-button (click)="onMessage()" style="margin-left: auto;">Follow</button>
     </div>
   `,
   styleUrls: ['./viewer.component.css']
