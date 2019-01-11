@@ -23,6 +23,12 @@ export interface DialogData {
   data: any;
 }
 
+export interface ParticipantDialogData {
+  info: any;
+  messages: Array<any>;
+  runtime: string;
+}
+
 @Component({
   selector: 'app-viewer',
   templateUrl: './viewer.component.html',
@@ -38,6 +44,7 @@ export class ViewerComponent implements OnInit {
   @ViewChildren('messageItems') messageItems: QueryList<any>;
 
   @Output() onReceive: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onNewTab: EventEmitter<any> = new EventEmitter<any>();
 
   unread: number = 0;
   message: string = '';
@@ -117,6 +124,22 @@ export class ViewerComponent implements OnInit {
         this.openfin.publish(this.runtime, this.topic, JSON.parse(this.message));
       } else {
         this.openfin.send(this.runtime, this.uuid, this.topic, JSON.parse(this.message));
+
+        // Spoof results since they will not be returned since you can't subscribe
+        // to the other UUID and yourself explicitly
+        if (!this.participants.hasOwnProperty(this.selfUuid)) {
+          this.participants[this.selfUuid] = {
+            name: this.selfUuid,
+            uuid: this.selfUuid,
+            color: '#2196F3'
+          };
+        }
+
+        this.messages.push({
+          participant: this.participants[this.selfUuid].name,
+          datetime: new Date().toLocaleString('en-US'), // TODO* get time from OF object
+          content: this.message
+        });
       }
 
       this.message = '';
@@ -156,12 +179,24 @@ export class ViewerComponent implements OnInit {
   viewParticipant(name: string) {
     let participant = {
       messages: this.messages.filter(m => m.participant === name),
-      info: this.participants[name]
+      info: this.participants[name],
+      runtime: this.runtime
     };
 
     const pDialogRef = this.dialog.open(ViewParticipantDialogComponent, {
-      width: '40%',
+      width: '500px',
       data: participant
+    });
+
+    pDialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // TODO* maybe check for a 'command' in result i.e. 'direct-message'
+        // in case other information is returned
+        let res = result;
+        result.topic = this.topic;
+        result.runtime = this.runtime;
+        this.onNewTab.emit(result);
+      }
     });
   }
 
@@ -305,11 +340,10 @@ export class AddJsonDialogComponent {
 })
 export class ViewParticipantDialogComponent {
 
-  
+
 
   constructor(public dialogRef: MatDialogRef<ViewParticipantDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: DialogData,
-              public openfin: OpenfinService) {
+              @Inject(MAT_DIALOG_DATA) public data: ParticipantDialogData) {
   }
 
   onClick(): void {
@@ -317,7 +351,7 @@ export class ViewParticipantDialogComponent {
   }
 
   onMessage(): void {
-
+    this.dialogRef.close({ uuid: this.data.info.uuid });
   }
 
 }

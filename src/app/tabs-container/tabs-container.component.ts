@@ -89,6 +89,27 @@ export class TabsContainerComponent implements OnInit {
     tab.unread = data.unread;
   }
 
+  newTab(data) {
+    let index = this.tabs.findIndex(t => {
+      return t.uuid === data.uuid && t.topic === data.topic;
+    });
+
+    if (index < 0) {
+      this.tabs.push({
+        label: data.topic,
+        runtime: data.runtime,
+        uuid: data.uuid,
+        topic: data.topic,
+        unread: 0
+      });
+
+      this.selected.setValue(this.tabs.length - 1);
+      this.onModify.emit({ tabs: this.tabs });
+    } else {
+      this.changeSelected(index);
+    }
+  }
+
 }
 
 @Component({

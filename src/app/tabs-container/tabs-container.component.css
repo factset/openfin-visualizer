@@ -14,7 +14,7 @@
 .tab-unread {
   font-style: italic;
   font-weight: bold;
-  color: #FFD54F; /* was #2196F3 */
+  color: #2196F3; /* was #FFD54F */
 }
 
 #add-button {

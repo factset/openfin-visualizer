@@ -4,6 +4,7 @@ const { connect } = require('hadouken-js-adapter');
 exports = module.exports = new OpenFin();
 
 let runtimes = {};
+let processes = {};
 
 function OpenFin() {}
 
@@ -36,6 +37,10 @@ ipcMain.on('openfin-send', async (event, data) => {
   await Send(event.sender, data.runtime, data.uuid, data.topic, data.data);
 });
 
+ipcMain.on('openfin-get-process', async (event, data) => {
+  await GetProcessInfo(event.sender, data.runtime, data.uuid);
+});
+
 async function Connect(runtime) {
   let options = {
     uuid: `openfin-visualizer-${runtime}`,
@@ -56,8 +61,7 @@ async function Connect(runtime) {
 
 async function Disconnect(runtime) {
   try {
-    let fin = runtimes[runtime];
-    await fin.System.exit();
+    await runtimes[runtime].System.exit();
     console.log(`Disconnected from OpenFin runtime ${runtime}`);
     delete runtimes[runtime];
   } catch(e) {
@@ -103,6 +107,15 @@ async function Send(sender, runtime, targetUuid, topic, data) {
 
 // TODO* getProcessList -> get all objects on current runtime
 // OR: getAll[External]Applications for generic application info (uuid, isRunning, and parentUuid)
+// TODO* the function is successfully called but getProcessList() is not
+async function GetProcessInfo(sender, runtime, uuid) {
+    await runtimes[runtime].System.getProcessList(list => {
+      let info = list.find(process => {
+        return process.uuid === uuid;
+      });
+      sender.send('openfin-got-process', { runtime: runtime, uuid: uuid, info: info });
+    });
+}
 
 exports.disconnectAll = async () => {
   for (let runtime in runtimes) {

@@ -157,3 +157,7 @@
   align-items: center;
   margin-bottom: 20px;
 }
+
+.participant-dialog-info-item {
+  margin: 10px 0;
+}
