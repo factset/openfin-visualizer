@@ -39,7 +39,15 @@ export class DrawerComponent implements OnInit {
   constructor(public dialog: MatDialog,
               public openfin: OpenfinService,
               public snackbar: MatSnackBar,
-              public cd: ChangeDetectorRef) { }
+              public cd: ChangeDetectorRef) {
+
+    // DEV* reload active channels upon refresh
+    let runtimes = this.openfin.getCurrentRuntimes();
+    runtimes.forEach(r => {
+      this.channels.push({ runtime: r.runtime, options: r.options, version: r.version });
+      if (!this.activeChannel) this.activeChannel = r.runtime;
+    });
+  }
 
   ngOnInit() {
   }

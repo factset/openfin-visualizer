@@ -42,7 +42,21 @@ export class TabsContainerComponent implements OnInit {
   runtime: string;
 
   constructor(public dialog: MatDialog,
-              public openfin: OpenfinService) { }
+              public snackbar: MatSnackBar,
+              public openfin: OpenfinService) {
+
+    // DEV* reload active subscriptions upon refresh
+    let subscriptions = this.openfin.getCurrentSubscriptions();
+    subscriptions.forEach(s => {
+      this.tabs.push({
+        label: s.topic,
+        runtime: s.runtime,
+        uuid: s.uuid,
+        topic: s.topic,
+        unread: 0
+      });
+    });
+  }
 
   ngOnInit() {
   }
@@ -55,16 +69,25 @@ export class TabsContainerComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.tabs.push({
-          label: result.topic,
-          runtime: this.chosenRuntime,
-          uuid: result.uuid,
-          topic: result.topic,
-          unread: 0
+        let index = this.tabs.findIndex(t => {
+          return t.runtime === this.chosenRuntime
+            && t.uuid === result.uuid
+            && t.topic === result.topic;
         });
 
-        this.selected.setValue(this.tabs.length - 1);
-        this.onModify.emit({ tabs: this.tabs });
+        if (index < 0) {
+          this.tabs.push({
+            label: result.topic,
+            runtime: this.chosenRuntime,
+            uuid: result.uuid,
+            topic: result.topic,
+            unread: 0
+          });
+          this.selected.setValue(this.tabs.length - 1);
+          this.onModify.emit({ tabs: this.tabs });
+        } else {
+          this.selected.setValue(index);
+        }
       }
     });
   }

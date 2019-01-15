@@ -19,6 +19,7 @@ import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
 import { Subscription } from 'rxjs';
 import { ClipboardService } from 'ngx-clipboard';
 import { OpenfinService } from '../openfin.service';
+import { ElectronService } from 'ngx-electron';
 
 export interface DialogData {
   data: any;
@@ -47,6 +48,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
   @Output() onReceive: EventEmitter<any> = new EventEmitter<any>();
   @Output() onNewTab: EventEmitter<any> = new EventEmitter<any>();
 
+  ipc: any;
   subscription: Subscription;
   unread: number = 0;
   message: string = '';
@@ -77,7 +79,16 @@ export class ViewerComponent implements OnInit, OnDestroy {
 
   constructor(public openfin: OpenfinService,
               public dialog: MatDialog,
-              public zone: NgZone) {
+              public zone: NgZone,
+              public snackBar: MatSnackBar,
+              private _electronService: ElectronService) {
+    this.ipc = _electronService.ipcRenderer;
+    this.ipc.on('saved-log', (event, data) => {
+      console.log(data.content);
+      this.snackBar.open(data.content, 'Dismiss 👋', {
+        duration: 3000
+      });
+    });
   }
 
   ngOnInit() {
@@ -227,6 +238,15 @@ export class ViewerComponent implements OnInit, OnDestroy {
 
   onKey(event: any) {
     this.message = event.target.value;
+  }
+
+  saveLog() {
+    this.ipc.send('save-log', {
+      log: JSON.stringify(this.messages),
+      runtime: this.runtime,
+      topic: this.topic,
+      uuid: this.uuid
+    });
   }
 
   // TODO* move this to pipe
