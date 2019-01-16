@@ -3,12 +3,14 @@ const { connect } = require('hadouken-js-adapter');
 
 exports = module.exports = new OpenFin();
 
-let runtimes = {};
-let versions = {};
-let subscriptions = {};
-let processes = {};
+let runtimes = {}; // used for fin object storage
+
+let request = {}; // used for passing information to listeners
 
 function OpenFin() {}
+
+
+// IPC Listeners
 
 ipcMain.on('openfin-connect', async (event, data) => {
   let version = await Connect(data.runtime);
@@ -45,42 +47,26 @@ ipcMain.on('openfin-send', async (event, data) => {
   await Send(event.sender, data.runtime, data.uuid, data.topic, data.data);
 });
 
-ipcMain.on('openfin-get-process', async (event, data) => {
-  await GetProcessInfo(event.sender, data.runtime, data.uuid);
-});
 
-ipcMain.on('openfin-get-applications', async (event, data) => {
-  await GetAllApplications(event.sender, data.runtime);
-});
-
-// Restore current runtimes
-ipcMain.on('openfin-restore-runtimes', event => {
-  event.returnValue = versions;
-});
-
-// Restore current subscriptions
-ipcMain.on('openfin-restore-subscriptions', event => {
-  event.returnValue = subscriptions;
-});
+// OpenFin Functions
 
 async function Connect(runtime) {
   let options = {
     uuid: `openfin-visualizer-${runtime}`,
+    name: `openfin-visualizer-${runtime}`,
     runtime: { version: runtime }
   };
 
   let version;
   try {
     let fin = await connect(options);
-
-    // Maybe create secondary OF application (via Application.create()) and
-    // add event listeners
     version = await fin.System.getVersion();
     runtimes[runtime] = fin;
-    versions[runtime] = version;
     console.log(`Connected to OpenFin version ${version} with runtime ${runtime}`);
   } catch(e) {
     console.log(e);
+    let body = `Could not connect`;
+    sender.send('error', { service: 'openfin', body: content, data: err });
   }
   return version;
 }
@@ -91,52 +77,45 @@ async function Disconnect(runtime) {
     await runtimes[runtime].wire.wire.shutdown();
     console.log(`Disconnected from OpenFin runtime ${runtime}`);
     delete runtimes[runtime];
-    delete versions[runtime]; // TODO* check if exists
   } catch(e) {
     console.log(e);
+    let body = `Could not disconnect`;
+    sender.send('error', { service: 'openfin', body: content, data: err });
   }
 }
 
 async function Subscribe(sender, runtime, targetUuid, topic) {
-  if (!subscriptions.hasOwnProperty(runtime)) subscriptions[runtime] = [];
-  let sub = subscriptions[runtime].find(s => {
-    return s.uuid === targetUuid && s.topic === topic;
-  });
+  request = {
+    sender: sender,
+    runtime: runtime,
+    targetUuid: targetUuid,
+    topic: topic
+  };
 
-  if (sub) {
-    console.log(`Subscription already exists for uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
-  } else {
-    await runtimes[runtime].InterApplicationBus.subscribe({ uuid: targetUuid }, topic, (data, uuid, name) => {
-      sender.send('openfin-subscribed', {
-        runtime: runtime,
-        targetUuid: targetUuid,
-        uuid: uuid,
-        topic: topic,
-        message: JSON.stringify(data)
-      });
-    }).then(() => {
-      // Push subscription
-      subscriptions[runtime].push({ uuid: targetUuid, topic: topic });
-      console.log(`Subscribed to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
-    }).catch(err => {
-      console.log(err);
-      sender.send('openfin-subscribe-error', { data: err });
-    });
-  }
-}
-
-// TODO* this is not working :( maybe check uuid or something
-async function Unsubscribe(runtime, targetUuid, topic) {
-  await runtimes[runtime].InterApplicationBus.unsubscribe({ uuid: targetUuid }, topic, () => {}).then(() => {
-    console.log(`Unsubscribed from uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
-
-    // Destroy subscription
-    subscriptions[runtime] = subscriptions[runtime].filter(s => {
-      return s.uuid !== targetUuid || s.topic !== topic;
-    });
-    if (subscriptions[runtime].length === 0) delete subscriptions[runtime];
+  await runtimes[runtime].InterApplicationBus.subscribe(
+    { uuid: targetUuid },
+    topic,
+    subscriptionListener
+  ).then(() => {
+    console.log(`Subscribed to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
   }).catch(err => {
     console.log(err);
+    let body = `Could not subscribe`;
+    sender.send('error', { service: 'openfin', body: content, data: err });
+  });
+}
+
+async function Unsubscribe(runtime, targetUuid, topic) {
+  await runtimes[runtime].InterApplicationBus.unsubscribe(
+    { uuid: targetUuid },
+    topic,
+    subscriptionListener
+  ).then(() => {
+    console.log(`Unsubscribed from uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+  }).catch(err => {
+    console.log(err);
+    let body = `Could not unsubscribe`;
+    sender.send('error', { service: 'openfin', body: content, data: err });
   });
 }
 
@@ -145,7 +124,8 @@ async function Publish(sender, runtime, topic, data) {
     console.log(`Published data [${data}] on channel [${runtime}] with topic [${topic}]`);
   }).catch(err =>  {
     console.log(err);
-    sender.send('openfin-publish-error', { data: err });
+    let body = `Could not publish`;
+    sender.send('error', { service: 'openfin', body: content, data: err });
   });
 }
 
@@ -155,36 +135,29 @@ async function Send(sender, runtime, targetUuid, topic, data) {
     console.log(`Sent data [${data}] to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
   }).catch(err =>  {
     console.log(err);
-    sender.send('openfin-send-error', { data: err });
+    let body = `Could not send`;
+    sender.send('error', { service: 'openfin', body: content, data: err });
   });
 }
 
-// TODO* getProcessList -> get all objects on current runtime
-// OR: getAll[External]Applications for generic application info (uuid, isRunning, and parentUuid)
-// TODO* the function is successfully called but getProcessList() is not
-async function GetProcessInfo(sender, runtime, uuid) {
-  await runtimes[runtime].System.getProcessList().then(list => {
-    let info = list.find(process => {
-      return process.uuid === uuid;
-    });
-    sender.send('openfin-got-process', { runtime: runtime, uuid: uuid, info: info });
+
+// Listeners
+
+let subscriptionListener = (data, uuid, name) => {
+  request.sender.send('openfin-subscribed', {
+    runtime: request.runtime,
+    targetUuid: request.targetUuid,
+    uuid: uuid,
+    topic: request.topic,
+    message: JSON.stringify(data)
   });
 }
 
-async function GetAllApplications(sender, runtime) {
-  await runtimes[runtime].System.getAllApplications(apps => {
-    console.log('App');
-    apps.forEach(app => console.log('App: ' + app.uuid));
-  });
-  await runtimes[runtime].System.getAllExternalApplications(apps => {
-    console.log('Ext');
-    apps.forEach(app => console.log('Ext: ' + app.uuid));
-  });
-}
+
+// Exported functions
 
 exports.disconnectAll = async () => {
   for (let runtime in runtimes) {
-    // Await disconnect call to ensure OpenFin receives the command
     console.log(`Disconnecting from ${runtime}`);
     await Disconnect(runtime);
   }

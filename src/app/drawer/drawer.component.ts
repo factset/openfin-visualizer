@@ -10,7 +10,6 @@ import {
   MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
-  MatSnackBar,
   MatSidenav
 } from '@angular/material';
 
@@ -38,19 +37,9 @@ export class DrawerComponent implements OnInit {
 
   constructor(public dialog: MatDialog,
               public openfin: OpenfinService,
-              public snackbar: MatSnackBar,
-              public cd: ChangeDetectorRef) {
+              public cd: ChangeDetectorRef) { }
 
-    // DEV* reload active channels upon refresh
-    let runtimes = this.openfin.getCurrentRuntimes();
-    runtimes.forEach(r => {
-      this.channels.push({ runtime: r.runtime, options: r.options, version: r.version });
-      if (!this.activeChannel) this.activeChannel = r.runtime;
-    });
-  }
-
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
   addChannel() {
     const dialogRef = this.dialog.open(AddVersionDialogComponent, {
@@ -123,6 +112,7 @@ export class DrawerComponent implements OnInit {
 })
 export class AddVersionDialogComponent {
 
+  // TODO* Don't do this based on channel name... do it based on version
   runtimes: any = [
     'stable',
     'community',

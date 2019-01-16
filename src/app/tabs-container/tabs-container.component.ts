@@ -12,8 +12,7 @@ import {
 import {
   MatDialog,
   MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatSnackBar
+  MAT_DIALOG_DATA
 } from '@angular/material';
 import { FormControl, Validators } from '@angular/forms';
 
@@ -42,24 +41,9 @@ export class TabsContainerComponent implements OnInit {
   runtime: string;
 
   constructor(public dialog: MatDialog,
-              public snackbar: MatSnackBar,
-              public openfin: OpenfinService) {
+              public openfin: OpenfinService) { }
 
-    // DEV* reload active subscriptions upon refresh
-    let subscriptions = this.openfin.getCurrentSubscriptions();
-    subscriptions.forEach(s => {
-      this.tabs.push({
-        label: s.topic,
-        runtime: s.runtime,
-        uuid: s.uuid,
-        topic: s.topic,
-        unread: 0
-      });
-    });
-  }
-
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
   addTab() {
     const dialogRef = this.dialog.open(AddTabDialogComponent, {
@@ -173,8 +157,7 @@ export class AddTabDialogComponent {
   ]);
 
   constructor(public dialogRef: MatDialogRef<AddTabDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-  }
+              @Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   onClick(): void {
     this.dialogRef.close({

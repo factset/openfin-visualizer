@@ -8,7 +8,10 @@
     </div>
   </div>
 
-  <div id="add-button" [ngClass]="{ 'add-button-disabled': !chosenRuntime }">
+  <div
+      id="add-button"
+      [ngStyle]="{ 'border-right': tabs.length > 0 ? 'none' : '1px solid rgba(0, 0, 0, 0.12)' }"
+      [ngClass]="{ 'add-button-disabled': !chosenRuntime }">
     <button
         mat-icon-button
         matTooltip="add topic"

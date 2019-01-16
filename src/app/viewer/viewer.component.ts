@@ -13,7 +13,7 @@ import {
   NgZone,
   OnDestroy
 } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
 
 import { Subscription } from 'rxjs';
@@ -80,15 +80,8 @@ export class ViewerComponent implements OnInit, OnDestroy {
   constructor(public openfin: OpenfinService,
               public dialog: MatDialog,
               public zone: NgZone,
-              public snackBar: MatSnackBar,
               private _electronService: ElectronService) {
-    this.ipc = _electronService.ipcRenderer;
-    this.ipc.on('saved-log', (event, data) => {
-      console.log(data.content);
-      this.snackBar.open(data.content, 'Dismiss 👋', {
-        duration: 3000
-      });
-    });
+    this.ipc = _electronService.ipcRenderer;  
   }
 
   ngOnInit() {
@@ -242,17 +235,31 @@ export class ViewerComponent implements OnInit, OnDestroy {
 
   saveLog() {
     this.ipc.send('save-log', {
-      log: JSON.stringify(this.messages),
+      log: this.prepLog(this.messages),
       runtime: this.runtime,
       topic: this.topic,
       uuid: this.uuid
     });
   }
 
+  prepLog(messages: any): string {
+    let header = `runtime [${this.runtime}] | topic [${this.topic}] | uuid [${this.uuid}]`;
+    let log = `${header}\r\n`;
+    for (let i = 0; i < header.length; i++) log += '=';
+    log += '\r\n\r\n';
+
+    messages.forEach(message => {
+      log += `${message.participant} <${message.datetime}>:\r\n`;
+      log += `${this.prettifyJson(message.content, true)}\r\n\r\n`;
+    });
+    return log;
+  }
+
   // TODO* move this to pipe
-  prettifyJson(json: string) {
+  prettifyJson(json: string, noHtml: boolean = false) {
     json = JSON.parse(json);
     json = JSON.stringify(json, undefined, 4);
+    if (noHtml) return json;
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
       let cls = 'number';

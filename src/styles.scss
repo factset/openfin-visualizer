@@ -31,8 +31,20 @@ mat-tab-header {
   flex-grow: 0 !important;
 }
 
+.mat-tab-header-pagination-before {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
+}
+
 .mat-tab-label {
   border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.mat-tab-label:first-child {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.mat-tab-label:first {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .mat-tab-label:hover {

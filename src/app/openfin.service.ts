@@ -8,9 +8,9 @@ import { ElectronService } from 'ngx-electron';
 export class OpenfinService {
 
   private ipc: any;
-  private runtimes: any = {};
 
-  public participants: any = {};
+  private runtimes: any = {}; // used for storing active runtimes
+  private subscriptions: any = {}; // used for storing active subscriptions
 
   constructor(private _electronService: ElectronService) {
     this.ipc = _electronService.ipcRenderer;
@@ -34,21 +34,15 @@ export class OpenfinService {
     this.ipc.on('openfin-unsubscribed', (event, data) => {
       this.unsubscribed(data.runtime, data.uuid, data.topic);
     });
-
-    this.ipc.on('openfin-got-process', (event, data) => {
-      console.log(data);
-      this.processReceived(data.runtime, data.uuid, data.info);
-    });
   }
 
+
   // Send Events
+
   connect(runtime: string): Observable<any> {
-    this.runtimes[runtime] = {};
-    this.runtimes[runtime].observable = new Subject<any>();
-    this.runtimes[runtime].topics = {};
-    this.runtimes[runtime].info = {};
+    this.runtimes[runtime] = new Subject<any>();
     this.ipc.send('openfin-connect', { runtime: runtime });
-    return this.runtimes[runtime].observable.asObservable();
+    return this.runtimes[runtime].asObservable();
   }
 
   disconnect(runtime: string) {
@@ -61,13 +55,12 @@ export class OpenfinService {
 
   // in this case, UUID represents the target for the subscription (not the sender)
   subscribe(runtime: string, uuid: string, topic: string): Observable<any> {
-    if (!this.runtimes[runtime].topics.hasOwnProperty(topic)) {
-      this.runtimes[runtime].topics[topic] = {};
+    if (!this.subscriptions[runtime].hasOwnProperty(topic)) {
+      this.subscriptions[runtime][topic] = {};
     }
-    console.log(this.runtimes[runtime].topics[topic]);
-    this.runtimes[runtime].topics[topic][uuid] = new Subject<any>();
+    this.subscriptions[runtime][topic][uuid] = new Subject<any>();
     this.ipc.send('openfin-subscribe', { runtime: runtime, uuid: uuid, topic: topic });
-    return this.runtimes[runtime].topics[topic][uuid].asObservable();
+    return this.subscriptions[runtime][topic][uuid].asObservable();
   }
 
   unsubscribe(runtime: string, uuid: string, topic: string) {
@@ -84,16 +77,12 @@ export class OpenfinService {
     this.ipc.send('openfin-send', { runtime: runtime, uuid: uuid, topic: topic, data: data });
   }
 
-  getProcess(runtime: string, uuid: string): Observable<any> {
-    this.runtimes[runtime].info[uuid] = new Subject<any>();
-    this.ipc.send('openfin-get-process', { runtime: runtime, uuid: uuid });
-    return this.runtimes[runtime].info[uuid].asObservable();
-  }
-
 
   // Receive Events
+
   connected(runtime: string, version: string) {
-    this.runtimes[runtime].observable.next({ version: version });
+    this.subscriptions[runtime] = {};
+    this.runtimes[runtime].next({ version: version });
     this.ipc.send('openfin-get-applications', { runtime: runtime });
   }
 
@@ -107,68 +96,20 @@ export class OpenfinService {
   }
 
   subscribed(runtime: string, targetUuid: string, uuid: string, topic: string, message: string) {
-    console.log('here');
-    this.runtimes[runtime].topics[topic][targetUuid].next({
+    this.subscriptions[runtime][topic][targetUuid].next({
       sender: uuid,
       message: message
     });
   }
 
   unsubscribed(runtime: string, uuid: string, topic: string) {
-    delete this.runtimes[runtime].topics[topic][uuid];
-    if (Object.keys(this.runtimes[runtime].topics[topic]).length === 0) {
-      delete this.runtimes[runtime].topics[topic];
+    delete this.subscriptions[runtime][topic][uuid];
+    if (Object.keys(this.subscriptions[runtime][topic]).length === 0) {
+      delete this.subscriptions[runtime][topic];
     }
-    console.log(this.runtimes[runtime].topics);
-  }
-
-  processReceived(runtime: string, uuid: string, info: any) {
-    this.runtimes[runtime].info[uuid].next({
-      info: info
-    });
   }
 
 
   // Helper Functions
-
-  // Get all active runtimes/channels
-  getCurrentRuntimes() {
-    let runtimes = this.ipc.sendSync('openfin-restore-runtimes');
-
-    let runtimesArr = [];
-    if (runtimes) {
-      for (let runtime in runtimes) {
-        this.runtimes[runtime] = {};
-        this.runtimes[runtime].observable = new Subject<any>();
-        this.runtimes[runtime].topics = {};
-        this.runtimes[runtime].info = {};
-
-        runtimesArr.push({
-          runtime: runtime,
-          version: runtimes[runtime],
-          options: {}
-        });
-      }
-    }
-    return runtimesArr;
-  }
-
-  // Get all active subscriptions
-  getCurrentSubscriptions() {
-    let subscriptions = this.ipc.sendSync('openfin-restore-subscriptions');
-    console.log(subscriptions);
-    let topicsArr = [];
-    for (let runtime in subscriptions) {
-      subscriptions[runtime].forEach(s => {
-        topicsArr.push({
-          runtime: runtime,
-          topic: s.topic,
-          uuid: s.uuid
-        });
-      });
-    }
-
-    return topicsArr;
-  }
 
 }
