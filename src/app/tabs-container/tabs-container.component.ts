@@ -48,6 +48,7 @@ export class TabsContainerComponent implements OnInit {
   addTab() {
     const dialogRef = this.dialog.open(AddTabDialogComponent, {
       width: '250px',
+      restoreFocus: false,
       data: this.chosenRuntime
     });
 
@@ -81,6 +82,7 @@ export class TabsContainerComponent implements OnInit {
     let tab = this.tabs.splice(index, 1)[0];
     this.openfin.unsubscribe(tab.runtime, tab.uuid, tab.topic);
     this.onModify.emit({ tabs: this.tabs });
+    // Maybe add a re-render here in case of overflow and pagination
   }
 
   changeSelected(index) {

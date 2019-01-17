@@ -81,7 +81,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
               public dialog: MatDialog,
               public zone: NgZone,
               private _electronService: ElectronService) {
-    this.ipc = _electronService.ipcRenderer;  
+    this.ipc = _electronService.ipcRenderer;
   }
 
   ngOnInit() {
@@ -163,6 +163,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
   openJson(data: string) {
     const dialogRef = this.dialog.open(AddJsonDialogComponent, {
       width: '50%',
+      restoreFocus: false,
       data: JSON.parse(data)
     });
 
@@ -176,6 +177,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
   addJson() {
     const dialogRef = this.dialog.open(AddJsonDialogComponent, {
       width: '50%',
+      restoreFocus: false,
       data: this.message ? JSON.parse(this.message) : null
     });
 
@@ -195,6 +197,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
 
     const pDialogRef = this.dialog.open(ViewParticipantDialogComponent, {
       width: '500px',
+      restoreFocus: false,
       data: participant
     });
 

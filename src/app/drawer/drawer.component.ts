@@ -44,6 +44,7 @@ export class DrawerComponent implements OnInit {
   addChannel() {
     const dialogRef = this.dialog.open(AddVersionDialogComponent, {
       width: '250px',
+      restoreFocus: false,
       data: { channels: this.channels }
     });
 

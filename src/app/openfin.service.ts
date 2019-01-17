@@ -100,6 +100,8 @@ export class OpenfinService {
       sender: uuid,
       message: message
     });
+    console.log(this.subscriptions);
+    console.log(`${runtime} ${targetUuid} ${uuid} ${topic}`);
   }
 
   unsubscribed(runtime: string, uuid: string, topic: string) {

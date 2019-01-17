@@ -84,20 +84,25 @@ async function Disconnect(runtime) {
   }
 }
 
+let subscriptions = {};
+
 async function Subscribe(sender, runtime, targetUuid, topic) {
-  request = {
+  let listener = subscriptionListener.bind({
     sender: sender,
     runtime: runtime,
     targetUuid: targetUuid,
     topic: topic
-  };
+  });
 
   await runtimes[runtime].InterApplicationBus.subscribe(
     { uuid: targetUuid },
     topic,
-    subscriptionListener
+    listener
   ).then(() => {
     console.log(`Subscribed to uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+    if (!subscriptions.hasOwnProperty(runtime)) subscriptions[runtime] = {};
+    if (!subscriptions[runtime].hasOwnProperty(topic)) subscriptions[runtime][topic] = {};
+    subscriptions[runtime][topic][targetUuid] = listener;
   }).catch(err => {
     console.log(err);
     let body = `Could not subscribe`;
@@ -106,12 +111,14 @@ async function Subscribe(sender, runtime, targetUuid, topic) {
 }
 
 async function Unsubscribe(runtime, targetUuid, topic) {
+  let listener = subscriptions[runtime][topic][targetUuid];
   await runtimes[runtime].InterApplicationBus.unsubscribe(
     { uuid: targetUuid },
     topic,
-    subscriptionListener
+    listener
   ).then(() => {
     console.log(`Unsubscribed from uuid [${targetUuid}] on channel [${runtime}] with topic [${topic}]`);
+    // TODO* delete subscription object
   }).catch(err => {
     console.log(err);
     let body = `Could not unsubscribe`;
@@ -143,18 +150,22 @@ async function Send(sender, runtime, targetUuid, topic, data) {
 
 // Listeners
 
-let subscriptionListener = (data, uuid, name) => {
-  request.sender.send('openfin-subscribed', {
-    runtime: request.runtime,
-    targetUuid: request.targetUuid,
+function subscriptionListener(data, uuid, name) {
+  this.sender.send('openfin-subscribed', {
+    runtime: this.runtime,
+    targetUuid: this.targetUuid,
     uuid: uuid,
-    topic: request.topic,
+    topic: this.topic,
     message: JSON.stringify(data)
   });
 }
 
+// Helper Functions
 
-// Exported functions
+// TODO* addUuid(), removeUuid() -> for subscribe/unsubscribe
+
+
+// Exported Functions
 
 exports.disconnectAll = async () => {
   for (let runtime in runtimes) {

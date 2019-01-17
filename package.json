@@ -8,8 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "electron": "electron ./src/electron.dev",
-    "pack": "npm run build && electron-packager dist/openfin-visualizer --out=packages --overwrite"
+    "electron": "electron ./electron.dev",
+    "pack": "ng build && webpack && electron-packager dist/openfin-visualizer --out=packages --overwrite"
   },
   "private": true,
   "dependencies": {
@@ -55,6 +55,8 @@
     "protractor": "~5.3.0",
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
-    "typescript": "~2.7.2"
+    "typescript": "~2.7.2",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1"
   }
 }

@@ -3,6 +3,6 @@
   "productName": "OpenFinVisualizer",
   "version": "0.0.0",
   "description": "OpenFinVisualizer",
-  "main": "./electron.prod.js",
+  "main": "./electron.js",
   "license": "MIT"
 }

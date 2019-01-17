@@ -6,7 +6,7 @@ const fs = require('fs');
 
 let win;
 
-const createWindow = () => {
+const createDevWindow = () => {
   // set timeout to render the window not until the Angular
   // compiler is ready to show the project
   setTimeout(() => {
@@ -15,6 +15,7 @@ const createWindow = () => {
       height: 900,
       minWidth: 800,
       minHeight: 600,
+      webPreferences: { webSecurity: false },
       icon: './src/favicon.ico'
     });
 
@@ -35,7 +36,29 @@ const createWindow = () => {
   }, 10000);
 }
 
-app.on('ready', createWindow);
+const createProdWindow = () => {
+  win = new BrowserWindow({
+    width: 1200,
+    height: 900,
+    minWidth: 800,
+    minHeight: 600,
+    webPreferences: { webSecurity: false },
+    icon: path.join(__dirname, 'favicon.ico'),
+  });
+
+  win.setMenu(null);
+
+  win.loadFile('./index.html');
+
+  win.webContents.on('did-navigate', event => openfin.disconnectAll());
+
+  // Perhaps not necessary considering runtimes disconnect anyway
+  win.on('close', () => openfin.disconnectAll());
+
+  win.on('closed', () => win = null);
+}
+
+app.on('ready', app.isPackaged ? createProdWindow : createDevWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
