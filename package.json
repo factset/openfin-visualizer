@@ -1,6 +1,7 @@
 {
   "name": "openfin-visualizer",
-  "version": "0.0.0",
+  "productName": "OpenFin Visualizer",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "concurrently \"ng serve\" \"npm run electron\"",
@@ -9,7 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "electron": "electron ./electron.dev",
-    "pack": "ng build && webpack && electron-packager dist/openfin-visualizer --out=packages --overwrite"
+    "pack": "ng build && webpack && electron-packager dist/openfin-visualizer --out=packages --icon=ofvlogo.ico --overwrite"
   },
   "private": true,
   "dependencies": {

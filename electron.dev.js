@@ -16,7 +16,7 @@ const createDevWindow = () => {
       minWidth: 800,
       minHeight: 600,
       webPreferences: { webSecurity: false },
-      icon: './src/favicon.ico'
+      icon: './ofvlogo.ico'
     });
 
     win.loadURL(url.format({
@@ -43,7 +43,7 @@ const createProdWindow = () => {
     minWidth: 800,
     minHeight: 600,
     webPreferences: { webSecurity: false },
-    icon: path.join(__dirname, 'favicon.ico'),
+    icon: path.join(__dirname, './ofvlogo.ico'),
   });
 
   win.setMenu(null);

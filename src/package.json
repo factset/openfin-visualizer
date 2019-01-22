@@ -1,8 +1,8 @@
 {
   "name": "openfin-visualizer",
-  "productName": "OpenFinVisualizer",
-  "version": "0.0.0",
-  "description": "OpenFinVisualizer",
+  "productName": "OpenFin Visualizer",
+  "version": "1.0.0",
+  "description": "OpenFin Visualizer",
   "main": "./electron.js",
   "license": "MIT"
 }
