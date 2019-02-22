@@ -38,8 +38,8 @@
           [uuid]="tab.uuid"
           [topic]="tab.topic"
           [selected]="selected.value === index"
-          (onReceive)="setUnread($event)"
-          (onNewTab)="newTab($event)">
+          (received)="setUnread($event)"
+          (newTabCreated)="newTab($event)">
         </app-viewer>
     </mat-tab>
   </mat-tab-group>
