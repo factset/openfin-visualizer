@@ -21,77 +21,6 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'app-drawer',
-  templateUrl: './drawer.component.html',
-  styleUrls: ['./drawer.component.css']
-})
-export class DrawerComponent implements OnInit {
-
-  @ViewChild('sidenav') sidenav: MatSidenav;
-
-  opened: boolean = true;
-  channels: Array<any> = [];
-  version: string;
-  activeChannel: string;
-  timeout: any;
-
-  constructor(public dialog: MatDialog,
-              public openfin: OpenfinService,
-              public cd: ChangeDetectorRef) { }
-
-  ngOnInit() { }
-
-  addChannel() {
-    const dialogRef = this.dialog.open(AddVersionDialogComponent, {
-      width: '250px',
-      restoreFocus: false,
-      data: { channels: this.channels }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.channels.push({ runtime: result.runtime, options: {} });
-
-        let connection = this.openfin.connect(result.runtime).subscribe(version => {
-          let channel = this.channels.find(c => c.runtime === result.runtime);
-          channel.version = version.version;
-          this.activeChannel = result.runtime;
-          this.cd.detectChanges(); // force update to page
-        });
-      }
-    });
-  }
-
-  removeChannel(event, index: number) {
-    event.stopPropagation();
-    let channel = this.channels.splice(index, 1)[0];
-    this.openfin.disconnect(channel.runtime);
-    this.activeChannel = this.channels.length > 0 ? this.channels[length - 1] : null;
-  }
-
-  removeAllChannels() {
-    event.stopPropagation();
-    this.openfin.disconnectAll();
-    this.channels = [];
-  }
-
-  setActive(runtime: string) {
-    if (this.channels.find(c => c.runtime === runtime).hasOwnProperty('version')) {
-      this.activeChannel = runtime;
-    }
-  }
-
-  tabsModified(data) {
-    if (!this.sidenav.opened && data.tabs.length === 0) {
-      this.sidenav.open();
-    } else if (this.sidenav.opened && data.tabs.length >= 0) {
-      this.sidenav.close();
-    }
-  }
-
-}
-
-@Component({
   selector: 'app-add-version-dialog',
   template: `
     <h1 mat-dialog-title>Connect to OpenFin</h1>
@@ -144,6 +73,77 @@ export class AddVersionDialogComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+}
+
+@Component({
+  selector: 'app-drawer',
+  templateUrl: './drawer.component.html',
+  styleUrls: ['./drawer.component.css']
+})
+export class DrawerComponent implements OnInit {
+
+  @ViewChild('sidenav') sidenav: MatSidenav;
+
+  opened = true;
+  channels: Array<any> = [];
+  version: string;
+  activeChannel: string;
+  timeout: any;
+
+  constructor(public dialog: MatDialog,
+              public openfin: OpenfinService,
+              public cd: ChangeDetectorRef) { }
+
+  ngOnInit() { }
+
+  addChannel() {
+    const dialogRef = this.dialog.open(AddVersionDialogComponent, {
+      width: '250px',
+      restoreFocus: false,
+      data: { channels: this.channels }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.channels.push({ runtime: result.runtime, options: {} });
+
+        const connection = this.openfin.connect(result.runtime).subscribe(version => {
+          const channel = this.channels.find(c => c.runtime === result.runtime);
+          channel.version = version.version;
+          this.activeChannel = result.runtime;
+          this.cd.detectChanges(); // force update to page
+        });
+      }
+    });
+  }
+
+  removeChannel(event, index: number) {
+    event.stopPropagation();
+    const channel = this.channels.splice(index, 1)[0];
+    this.openfin.disconnect(channel.runtime);
+    this.activeChannel = this.channels.length > 0 ? this.channels[length - 1] : null;
+  }
+
+  removeAllChannels() {
+    event.stopPropagation();
+    this.openfin.disconnectAll();
+    this.channels = [];
+  }
+
+  setActive(runtime: string) {
+    if (this.channels.find(c => c.runtime === runtime).hasOwnProperty('version')) {
+      this.activeChannel = runtime;
+    }
+  }
+
+  tabsModified(data) {
+    if (!this.sidenav.opened && data.tabs.length === 0) {
+      this.sidenav.open();
+    } else if (this.sidenav.opened && data.tabs.length >= 0) {
+      this.sidenav.close();
+    }
   }
 
 }

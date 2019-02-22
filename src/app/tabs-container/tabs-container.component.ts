@@ -24,106 +24,6 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'app-tabs-container',
-  templateUrl: './tabs-container.component.html',
-  styleUrls: ['./tabs-container.component.css']
-})
-export class TabsContainerComponent implements OnInit {
-
-  @Input() chosenRuntime: string;
-  @ViewChildren('appViewer') appViewers: QueryList<any>;
-
-  @Output() onModify: EventEmitter<any> = new EventEmitter<any>();
-
-  tabs: any = [];
-  selected = new FormControl(0);
-
-  runtime: string;
-
-  constructor(public dialog: MatDialog,
-              public openfin: OpenfinService) { }
-
-  ngOnInit() { }
-
-  addTab() {
-    const dialogRef = this.dialog.open(AddTabDialogComponent, {
-      width: '250px',
-      restoreFocus: false,
-      data: this.chosenRuntime
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        let index = this.tabs.findIndex(t => {
-          return t.runtime === this.chosenRuntime
-            && t.uuid === result.uuid
-            && t.topic === result.topic;
-        });
-
-        if (index < 0) {
-          this.tabs.push({
-            label: result.topic,
-            runtime: this.chosenRuntime,
-            uuid: result.uuid,
-            topic: result.topic,
-            unread: 0
-          });
-          this.selected.setValue(this.tabs.length - 1);
-          this.onModify.emit({ tabs: this.tabs });
-        } else {
-          this.selected.setValue(index);
-        }
-      }
-    });
-  }
-
-  removeTab(event, index: number) {
-    event.stopPropagation();
-    let tab = this.tabs.splice(index, 1)[0];
-    this.openfin.unsubscribe(tab.runtime, tab.uuid, tab.topic);
-    this.onModify.emit({ tabs: this.tabs });
-    // Maybe add a re-render here in case of overflow and pagination
-  }
-
-  changeSelected(index) {
-    let viewers = this.appViewers.toArray();
-    if (viewers.length > 0) {
-      this.selected.setValue(index);
-      viewers[index].waitScrollToEnd();
-    }
-  }
-
-  setUnread(data) {
-    let tab = this.tabs.find(t => {
-      return t.topic === data.topic && t.runtime === data.runtime;
-    });
-    tab.unread = data.unread;
-  }
-
-  newTab(data) {
-    let index = this.tabs.findIndex(t => {
-      return t.uuid === data.uuid && t.topic === data.topic;
-    });
-
-    if (index < 0) {
-      this.tabs.push({
-        label: data.topic,
-        runtime: data.runtime,
-        uuid: data.uuid,
-        topic: data.topic,
-        unread: 0
-      });
-
-      this.selected.setValue(this.tabs.length - 1);
-      this.onModify.emit({ tabs: this.tabs });
-    } else {
-      this.changeSelected(index);
-    }
-  }
-
-}
-
-@Component({
   selector: 'app-add-tab-dialog',
   template: `
     <h1 mat-dialog-title>Add Topic</h1>
@@ -152,8 +52,8 @@ export class TabsContainerComponent implements OnInit {
 })
 export class AddTabDialogComponent {
 
-  uuid: string = '';
-  topic: string = '';
+  uuid = '';
+  topic = '';
   topicFormControl = new FormControl('', [
     Validators.required
   ]);
@@ -170,6 +70,106 @@ export class AddTabDialogComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+}
+
+@Component({
+  selector: 'app-tabs-container',
+  templateUrl: './tabs-container.component.html',
+  styleUrls: ['./tabs-container.component.css']
+})
+export class TabsContainerComponent implements OnInit {
+
+  @Input() chosenRuntime: string;
+  @ViewChildren('appViewer') appViewers: QueryList<any>;
+
+  @Output() modified: EventEmitter<any> = new EventEmitter<any>();
+
+  tabs: any = [];
+  selected = new FormControl(0);
+
+  runtime: string;
+
+  constructor(public dialog: MatDialog,
+              public openfin: OpenfinService) { }
+
+  ngOnInit() { }
+
+  addTab() {
+    const dialogRef = this.dialog.open(AddTabDialogComponent, {
+      width: '250px',
+      restoreFocus: false,
+      data: this.chosenRuntime
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const index = this.tabs.findIndex(t => {
+          return t.runtime === this.chosenRuntime
+            && t.uuid === result.uuid
+            && t.topic === result.topic;
+        });
+
+        if (index < 0) {
+          this.tabs.push({
+            label: result.topic,
+            runtime: this.chosenRuntime,
+            uuid: result.uuid,
+            topic: result.topic,
+            unread: 0
+          });
+          this.selected.setValue(this.tabs.length - 1);
+          this.modified.emit({ tabs: this.tabs });
+        } else {
+          this.selected.setValue(index);
+        }
+      }
+    });
+  }
+
+  removeTab(event, index: number) {
+    event.stopPropagation();
+    const tab = this.tabs.splice(index, 1)[0];
+    this.openfin.unsubscribe(tab.runtime, tab.uuid, tab.topic);
+    this.modified.emit({ tabs: this.tabs });
+    // Maybe add a re-render here in case of overflow and pagination
+  }
+
+  changeSelected(index) {
+    const viewers = this.appViewers.toArray();
+    if (viewers.length > 0) {
+      this.selected.setValue(index);
+      viewers[index].waitScrollToEnd();
+    }
+  }
+
+  setUnread(data) {
+    const tab = this.tabs.find(t => {
+      return t.topic === data.topic && t.runtime === data.runtime;
+    });
+    tab.unread = data.unread;
+  }
+
+  newTab(data) {
+    const index = this.tabs.findIndex(t => {
+      return t.uuid === data.uuid && t.topic === data.topic;
+    });
+
+    if (index < 0) {
+      this.tabs.push({
+        label: data.topic,
+        runtime: data.runtime,
+        uuid: data.uuid,
+        topic: data.topic,
+        unread: 0
+      });
+
+      this.selected.setValue(this.tabs.length - 1);
+      this.modified.emit({ tabs: this.tabs });
+    } else {
+      this.changeSelected(index);
+    }
   }
 
 }

@@ -25,7 +25,7 @@ export class OpenfinService {
 
     this.ipc.on('openfin-disconnected-all', event => {
       this.disconnectedAll();
-    })
+    });
 
     this.ipc.on('openfin-subscribed', (event, data) => {
       this.subscribed(data.runtime, data.targetUuid, data.uuid, data.topic, data.message);
@@ -87,7 +87,6 @@ export class OpenfinService {
   }
 
   disconnected(runtime: string) {
-    //this.runtimes[runtime].observable.next({ version: null });
     delete this.runtimes[runtime];
   }
 

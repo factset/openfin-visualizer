@@ -54,6 +54,6 @@
       <mat-icon aria-label="Expand drawer" *ngIf="!opened">keyboard_arrow_right</mat-icon>
       <mat-icon aria-label="Collapse drawer" *ngIf="opened">keyboard_arrow_left</mat-icon>
     </button>
-    <app-tabs-container [chosenRuntime]="activeChannel" (onModify)="tabsModified($event)"></app-tabs-container>
+    <app-tabs-container [chosenRuntime]="activeChannel" (modified)="tabsModified($event)"></app-tabs-container>
   </mat-drawer-content>
 </mat-drawer-container>
